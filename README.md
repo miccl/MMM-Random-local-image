@@ -40,3 +40,4 @@ The following properties can be configured:
 | `randomOrder` | Display images in random order <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `true` |
 | `opacity` | Opacity of the image <br><br> **Possible Values:** 0.0 to 1.0 <br> **Default value:** |
 | `photoDir` | Local path to your photos. root dir is Magic-Mirror root directory. <br><br> **Possible Values:** Local path <br> **Default value:** ./modules/MMM-Random-local-image/photos/ |
+| `showAdditionalInfo` | Show image meta info. <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `false` |

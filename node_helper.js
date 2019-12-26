@@ -19,14 +19,16 @@ module.exports = NodeHelper.create({
 	getImages: function (self, photoDir) {
 		var images = {}
 		images = new Array();
-        console.log('Loading images...');
+		console.log('Loading images...');
 		recursive(photoDir, function (err, data) {
 			if (data !== undefined && data.length > 0) {
 				for (i = 0; i < data.length; i++) {
 					var photoFullPath = data[i];
+					var photoRelativePath = data[i].substr(photoDir.length - 1);
 					if (isImage(photoFullPath)) {
 						images.push({
 							'fullPath': photoFullPath,
+							'relativePath': photoRelativePath
 						});
 					}
 				}

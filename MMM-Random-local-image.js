@@ -10,6 +10,7 @@ Module.register("MMM-Random-local-image", {
     randomOrder: true,
     opacity: 1.0,
     photoDir: "./modules/MMM-Random-local-image/photos/",
+    showAdditionalInformation: false,
     maxWidth: "100%",
     maxHeight: "100%"
   },
@@ -44,19 +45,29 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
-    wrapper.appendChild(this.addImage(image.fullPath));
+    wrapper.appendChild(this.addImage(image));
+    if (this.config.showAdditionalInformation) {
+      wrapper.appendChild(this.addFilePath(image));
+    }
 
     return wrapper;
   },
 
-  addImage: function (imagePath) {
-    var imgEl = document.createElement("img");
-    imgEl.src = imagePath;
-    imgEl.id = "mmm-random-local-image";
-    imgEl.style.maxWidth = this.config.maxWidth;
-    imgEl.style.maxHeight = this.config.maxHeight;
-    imgEl.style.opacity = this.config.opacity;
-    return imgEl;
+  addImage: function (image) {
+    var element = document.createElement("img");
+    element.src = image.fullPath;
+    element.style.maxWidth = this.config.maxWidth;
+    element.style.maxHeight = this.config.maxHeight;
+    element.style.opacity = this.config.opacity;
+    return element;
+  },
+
+  addFilePath: function (image) {
+    var element = document.createElement("div");
+    element.style.color = "white";
+    var node = document.createTextNode(image.relativePath);
+    element.appendChild(node);
+    return element;
   },
 
   schedulePhotoUpdateInterval: function () {
