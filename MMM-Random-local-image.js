@@ -38,19 +38,20 @@ Module.register("MMM-Random-local-image", {
     }
 
     var image = this.images[this.imageIndex];
-    if (image && image.src) {
-      Log.log(`Image loaded: ${image.photoLink}`);
-      wrapper.appendChild(this.addImage(image.src));
-    } else {
+    if (!image) {
       Log.error(`Could not load image (index: ${this.imageIndex})`)
+      wrapper.innerHTML = this.translate("ERROR LOADING")
+      return wrapper;
     }
+
+    wrapper.appendChild(this.addImage(image.fullPath));
 
     return wrapper;
   },
 
-  addImage: function (imageSrc) {
+  addImage: function (imagePath) {
     var imgEl = document.createElement("img");
-    imgEl.src = imageSrc;
+    imgEl.src = imagePath;
     imgEl.id = "mmm-random-local-image";
     imgEl.style.maxWidth = this.config.maxWidth;
     imgEl.style.maxHeight = this.config.maxHeight;
