@@ -37,6 +37,13 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
+    var image = this.getImage();
+    wrapper.appendChild(image);
+
+    return wrapper;
+  },
+
+  getImage: function() {
     var image = this.images.photo[this.imageIndex];
     Log.log(`Image loaded: ${image.photoLink}`);
     var img = document.createElement("img");
@@ -45,11 +52,8 @@ Module.register("MMM-Random-local-image", {
     img.style.maxWidth = this.config.maxWidth;
     img.style.maxHeight = this.config.maxHeight;
     img.style.opacity = this.config.opacity;
-    wrapper.appendChild(img);
-
-    return wrapper;
+    return img;
   },
-
 
   schedulePhotoUpdateInterval: function() {
     var self = this;
