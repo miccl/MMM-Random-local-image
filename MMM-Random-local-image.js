@@ -6,7 +6,7 @@
 
 Module.register("MMM-Random-local-image", {
   defaults: {
-    photoUpdateInterval: 5 * 60 * 1000, // Update every 5 minutes.
+    photoUpdateInterval: 60 * 1000, // Update every minute
     randomOrder: true,
     opacity: 1.0,
     photoDir: "./modules/MMM-Random-local-image/photos/",
@@ -16,7 +16,7 @@ Module.register("MMM-Random-local-image", {
 
   loaded: false,
 
-  start: function() {
+  start: function () {
     Log.info("Module started!");
     Log.info("Display in order: " + (this.config.randomOrder ? "Yes" : "No"));
     this.imageIndex = 0;
@@ -28,7 +28,7 @@ Module.register("MMM-Random-local-image", {
     });
   },
 
-  getDom: function() {
+  getDom: function () {
     var wrapper = document.createElement("div");
 
     if (!this.loaded) {
@@ -37,30 +37,33 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
-    var image = this.getImage();
-    wrapper.appendChild(image);
+    var image = this.images[this.imageIndex];
+    if (image && image.src) {
+      Log.log(`Image loaded: ${image.photoLink}`);
+      wrapper.appendChild(this.addImage(image.src));
+    } else {
+      Log.error(`Could not load image (index: ${this.imageIndex})`)
+    }
 
     return wrapper;
   },
 
-  getImage: function() {
-    var image = this.images.photo[this.imageIndex];
-    Log.log(`Image loaded: ${image.photoLink}`);
-    var img = document.createElement("img");
-    img.src = image.photolink;
-    img.id = "mmm-random-local-image";
-    img.style.maxWidth = this.config.maxWidth;
-    img.style.maxHeight = this.config.maxHeight;
-    img.style.opacity = this.config.opacity;
-    return img;
+  addImage: function (imageSrc) {
+    var imgEl = document.createElement("img");
+    imgEl.src = imageSrc;
+    imgEl.id = "mmm-random-local-image";
+    imgEl.style.maxWidth = this.config.maxWidth;
+    imgEl.style.maxHeight = this.config.maxHeight;
+    imgEl.style.opacity = this.config.opacity;
+    return imgEl;
   },
 
-  schedulePhotoUpdateInterval: function() {
+  schedulePhotoUpdateInterval: function () {
     var self = this;
 
     Log.info("Scheduled update interval set up...");
 
-    setInterval(function() {
+    setInterval(function () {
       // Get random photo from array
       self.nextImageIndex();
 
@@ -68,7 +71,7 @@ Module.register("MMM-Random-local-image", {
     }, this.config.photoUpdateInterval);
   },
 
-  socketNotificationReceived: function(notification, payload) {
+  socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGE_LIST") {
       this.images = payload;
 
@@ -81,9 +84,9 @@ Module.register("MMM-Random-local-image", {
     }
   },
 
-  nextImageIndex: function() {
+  nextImageIndex: function () {
     var self = this;
-    var imageCount = self.images.photo.length;
+    var imageCount = self.images.length;
 
     if (this.config.randomOrder) {
       // get random number between 0 and (imageCount - 1)
@@ -97,7 +100,7 @@ Module.register("MMM-Random-local-image", {
     }
   },
 
-  getScripts: function() {
+  getScripts: function () {
     return [this.file("node_modules/jquery/dist/jquery.min.js")];
   }
 });
