@@ -1,0 +1,13 @@
+{
+  "name": "mmm-random-local-image",
+  "version": "1.0.0",
+  "description": "Shows a random image from local folder",
+  "main": "MMM-Random-local-image.js",
+  "author": "miccl",
+  "license": "ISC",
+  "dependencies": {
+    "is-image": "^2.0.0",
+    "jquery": "^2.1.1",
+    "recursive-readdir": "^2.1.0"
+  }
+}
