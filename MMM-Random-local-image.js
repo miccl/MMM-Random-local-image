@@ -6,7 +6,8 @@
 
 Module.register("MMM-Random-local-image", {
   defaults: {
-    photoUpdateInterval: 60 * 1000, // Update every minute
+    photoUpdateInterval: 30 * 1000, // Update every minute
+    photoLoadInitialDelay: 1000,
     randomOrder: true,
     opacity: 1.0,
     photoDir: "./modules/MMM-Random-local-image/photos/",
@@ -23,6 +24,10 @@ Module.register("MMM-Random-local-image", {
     this.imageIndex = 0;
     this.images = {};
 
+    setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
+  },
+
+  loadImages: function () {
     this.sendSocketNotification("RANDOM_IMAGES_GET", {
       photoDir: this.config.photoDir,
       reloadUpdateInterval: this.config.reloadUpdateInterval
