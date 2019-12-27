@@ -111,8 +111,4 @@ Module.register("MMM-Random-local-image", {
       }
     }
   },
-
-  getScripts: function () {
-    return [this.file("node_modules/jquery/dist/jquery.min.js")];
-  }
 });
