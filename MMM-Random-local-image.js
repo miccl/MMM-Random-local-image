@@ -16,13 +16,13 @@ Module.register("MMM-Random-local-image", {
     maxHeight: "100%"
   },
 
-  loaded: false,
+  imageLoadFinished: false,
+  imageIndex: 0,
+  images: [],
 
   start: function () {
-    Log.info("Module started!");
+    Log.info(`Module ${this.name} started...`);
     Log.info("Display in order: " + (this.config.randomOrder ? "Yes" : "No"));
-    this.imageIndex = 0;
-    this.images = {};
 
     setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
   },
@@ -37,7 +37,7 @@ Module.register("MMM-Random-local-image", {
   getDom: function () {
     var wrapper = document.createElement("div");
 
-    if (!this.loaded) {
+    if (!this.imageLoadFinished) {
       wrapper.innerHTML = this.translate("LOADING");
 
       return wrapper;
@@ -87,11 +87,11 @@ Module.register("MMM-Random-local-image", {
     if (notification === "RANDOM_IMAGE_LIST") {
       this.images = payload;
 
-      if (!this.loaded) {
+      if (!this.imageLoadFinished) {
         this.schedulePhotoUpdateInterval();
       }
-
-      this.loaded = true;
+      
+      this.imageLoadFinished = true;    
       this.updateDom();
     }
   },
