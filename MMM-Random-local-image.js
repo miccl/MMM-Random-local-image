@@ -76,15 +76,10 @@ Module.register("MMM-Random-local-image", {
   },
 
   schedulePhotoUpdateInterval: function () {
-    var self = this;
-
     Log.info("Scheduled update interval set up...");
-
-    setInterval(function () {
-      // Get random photo from array
-      self.nextImageIndex();
-
-      self.updateDom();
+    setInterval(() => {
+      this.nextImageIndex();
+      this.updateDom();
     }, this.config.photoUpdateInterval);
   },
 
@@ -102,8 +97,7 @@ Module.register("MMM-Random-local-image", {
   },
 
   nextImageIndex: function () {
-    var self = this;
-    var imageCount = self.images.length;
+    var imageCount = this.images.length;
 
     if (this.config.randomOrder) {
       // get random number between 0 and (imageCount - 1)
