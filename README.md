@@ -44,6 +44,7 @@ The following properties can be configured:
 |--------|-------------|
 | `photoUpdateInterval` | How often a new photo is displayed <br><br> **Possible Values:** A positive number of milliseconds <br> **Default value:** 1 * 60 * 1000 (1 minute)|
 | `photoLoadInitialDelay` | Initial delay of the image loading <br><br> **Possible Values:** A positive number of milliseconds <br> **Default value:** 1 * 1000 (1 second)|
+| `photoLoadUpdateInterval` | Time between loading images <br><br> **Possible Values:** A positive number of milliseconds <br> **Default value:** 12 &* 60 * 60 * 1000 (every 12 hours)|
 | `randomOrder` | Display images in random order <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `true` |
 | `opacity` | Opacity of the image <br><br> **Possible Values:** 0.0 to 1.0 <br> **Default value:** 1.0 |
 | `photoDir` | Local path to your photos. root dir is Magic-Mirror root directory. <br><br> **Possible Values:** Local path <br> **Default value:** ./modules/MMM-Random-local-image/photos/ |

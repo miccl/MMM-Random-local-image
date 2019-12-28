@@ -8,6 +8,7 @@ Module.register("MMM-Random-local-image", {
   defaults: {
     photoUpdateInterval: 30 * 1000, // Update every minute
     photoLoadInitialDelay: 1000,
+    photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
     opacity: 1.0,
     photoDir: "./modules/MMM-Random-local-image/photos/",
@@ -76,13 +77,6 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  schedulePhotoUpdateInterval: function () {
-    Log.info("Scheduled update interval set up...");
-    setInterval(() => {
-      this.nextImageIndex();
-      this.updateDom();
-    }, this.config.photoUpdateInterval);
-  },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGE_LIST") {
@@ -90,11 +84,20 @@ Module.register("MMM-Random-local-image", {
 
       if (!this.imageLoadFinished) {
         this.schedulePhotoUpdateInterval();
+        this.schedulePhotoLoadUpdateInterval();
       }
-      
-      this.imageLoadFinished = true;    
+
+      this.imageLoadFinished = true;
       this.updateDom();
     }
+  },
+
+  schedulePhotoUpdateInterval: function () {
+    Log.info("Scheduled update interval...");
+    setInterval(() => {
+      this.nextImageIndex();
+      this.updateDom();
+    }, this.config.photoUpdateInterval);
   },
 
   nextImageIndex: function () {
@@ -110,5 +113,11 @@ Module.register("MMM-Random-local-image", {
         this.imageIndex = 0;
       }
     }
+  },
+
+  schedulePhotoLoadUpdateInterval: function () {
+    Log.info("Scheduled photo load update interval...");
+
+    setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
   },
 });
