@@ -6,7 +6,7 @@
 
 Module.register("MMM-Random-local-image", {
   defaults: {
-    photoUpdateInterval: 30 * 1000, // Update every minute
+    photoUpdateInterval: 30 * 1000,
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
@@ -25,6 +25,7 @@ Module.register("MMM-Random-local-image", {
     Log.info(`Module ${this.name} started...`);
     Log.info("Display in order: " + (this.config.randomOrder ? "Yes" : "No"));
 
+    // load images after some delay
     setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
   },
 
@@ -59,7 +60,7 @@ Module.register("MMM-Random-local-image", {
     return wrapper;
   },
 
-  addImage: function (image) {
+  createImageElement: function (image) {
     var element = document.createElement("img");
     element.src = image.fullPath;
     element.style.maxWidth = this.config.maxWidth;
@@ -68,7 +69,7 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  addFilePath: function (image) {
+  createFilePathElement: function (image) {
     var element = document.createElement("div");
     // use styles from magic mirrors main.css
     element.className = 'dimm small regular';
