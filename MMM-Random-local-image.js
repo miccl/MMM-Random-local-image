@@ -52,9 +52,9 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
-    wrapper.appendChild(this.addImage(image));
+    wrapper.appendChild(this.createImageElement(image));
     if (this.config.showAdditionalInformation) {
-      wrapper.appendChild(this.addFilePath(image));
+      wrapper.appendChild(this.createFilePathElement(image));
     }
 
     return wrapper;
@@ -81,6 +81,7 @@ Module.register("MMM-Random-local-image", {
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGE_LIST") {
+      Log.info("Image received...")
       this.images = payload;
 
       if (!this.imageLoadFinished) {
