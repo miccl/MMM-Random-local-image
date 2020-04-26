@@ -11,7 +11,6 @@ Module.register("MMM-Random-local-image", {
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
     opacity: 1.0,
-    photoDir: "./modules/MMM-Random-local-image/photos/",
     showAdditionalInformation: false,
     maxWidth: "100%",
     maxHeight: "100%"
@@ -25,6 +24,10 @@ Module.register("MMM-Random-local-image", {
     Log.info(`Module ${this.name} started...`);
     Log.info("Display in order: " + (this.config.randomOrder ? "Yes" : "No"));
 
+    this.error = null;
+    if (!this.config.photoDir) {
+      this.error = "Missing required parameter 'photoDir'"
+    }
     // load images after some delay
     setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
   },
@@ -38,7 +41,9 @@ Module.register("MMM-Random-local-image", {
 
   getDom: function () {
     var wrapper = document.createElement("div");
-
+    if (this.error != null) {
+      wrapper.innerHTML = this.translate(this.error);
+    }
     if (!this.imageLoadFinished) {
       wrapper.innerHTML = this.translate("LOADING");
 
