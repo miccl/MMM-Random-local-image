@@ -12,7 +12,8 @@ Module.register("MMM-Random-local-image", {
     randomOrder: true,
     selectFromSubdirectories: false,
     opacity: 1.0,
-    showAdditionalInformation: false,
+    photoDir: "./modules/MMM-Random-local-image/photos/",
+    showAdditionalInformation: true,
     maxWidth: "100%",
     maxHeight: "100%"
   },
