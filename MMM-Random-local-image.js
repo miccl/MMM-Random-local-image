@@ -10,8 +10,10 @@ Module.register("MMM-Random-local-image", {
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
+    selectFromSubdirectories: false,
     opacity: 1.0,
-    showAdditionalInformation: false,
+    photoDir: "./modules/MMM-Random-local-image/photos/",
+    showAdditionalInformation: true,
     maxWidth: "100%",
     maxHeight: "100%"
   },
@@ -35,7 +37,8 @@ Module.register("MMM-Random-local-image", {
   loadImages: function () {
     this.sendSocketNotification("RANDOM_IMAGES_GET", {
       photoDir: this.config.photoDir,
-      reloadUpdateInterval: this.config.reloadUpdateInterval
+      reloadUpdateInternval: this.config.reloadUpdateInternval,
+      selectFromSubdirectories: this.config.selectFromSubdirectories
     });
   },
 
