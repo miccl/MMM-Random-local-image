@@ -125,6 +125,12 @@ Module.register("MMM-Random-local-image", {
     }, this.config.photoUpdateInterval);
   },
 
+  schedulePhotoLoadUpdateInterval: function () {
+    Log.info("Scheduled photo load update interval...");
+
+    setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
+  },
+
   nextImageIndex: function () {
     this.imageIndex = this.config.randomOrder
       ? this.imageOrder[this.shownImagesCount]
@@ -166,11 +172,5 @@ Module.register("MMM-Random-local-image", {
     }
 
     return array;
-  },
-
-  schedulePhotoLoadUpdateInterval: function () {
-    Log.info("Scheduled photo load update interval...");
-
-    setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
   },
 });
