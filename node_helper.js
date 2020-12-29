@@ -14,32 +14,25 @@ module.exports = NodeHelper.create({
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === 'RANDOM_IMAGES_GET') {
 			var self = this;
-			photoDir = payload.photoDir;
-			selectFromSubdirectories = payload.selectFromSubdirectories;
-			self.getImages(self, photoDir, selectFromSubdirectories);
+			self.getImages(self, payload.photoDir, payload.selectFromSubdirectories);
 		}
 	},
 
-	getImages: function (self, photoDir, selectFromSubdirectories) {
+	getImages: function (self, baseDir, selectFromSubdirectories) {
 		var images = {}
 		images = new Array();
 		console.log('Loading images...');
 
-		// if subdirectories enbabled, pick a random subdirectory inside the photoDir instead the photoDir
-		if (selectFromSubdirectories) {
-			const subDirectories = self.getSubDirectories(photoDir);
-			const randomSubDirectory = subDirectories[Math.floor(Math.random() * subDirectories.length)];
-			photoDir = `${photoDir}/${randomSubDirectory}`
-		}
+		const photoDir = getPhotoDir(self, baseDir, selectFromSubdirectories);
 
 		recursive(photoDir, function (err, data) {
 			if (data !== undefined && data.length > 0) {
 				for (i = 0; i < data.length; i++) {
 					var photoFullPath = data[i];
 					// only show directory if a subdirectory is selected
-					var parentDirectory = selectFromSubdirectories ? path.basename(photoDir) + '/' : '';
+					var parentDirectory = path.basename(photoDir);
 					var photoRelativePath = parentDirectory + photoFullPath.substr(photoDir.length - 2);
-
+					
 					if (isImage(photoFullPath)) {
 						images.push({
 							'fullPath': photoFullPath,
@@ -52,10 +45,20 @@ module.exports = NodeHelper.create({
 				return;
 			}
 
-			console.log('Loaded ' + images.length + ' images');
+			console.log(`Loading ${images.length} images from dir ${photoDir}...`);
 			self.sendSocketNotification('RANDOM_IMAGE_LIST', images);
 		});
 
+	},
+
+	getPhotoDir(self, baseDir, selectFromSubdirectories) {
+		// if subdirectories enbabled, pick a random subdirectory inside the photoDir instead the photoDir
+		if (selectFromSubdirectories) {
+			const subDirectories = self.getSubDirectories(baseDir);
+			const randomSubDirectory = subDirectories[Math.floor(Math.random() * subDirectories.length)];
+			return `${baseDir}/${randomSubDirectory}`;
+		}
+		return baseDir;
 	},
 
 	getSubDirectories(sourcePath) {

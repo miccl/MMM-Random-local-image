@@ -33,7 +33,8 @@ modules: [
     module: "MMM-Random-local-image",
     position: "fullscreen_below",
     config: {
-      photoDir: "./modules/MMM-Random-local-image/exampleImages",
+	  photoDir: "./modules/MMM-Random-local-image/exampleImages",
+	  // below are more options
     },
   },
 ];
