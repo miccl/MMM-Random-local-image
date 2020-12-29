@@ -21,9 +21,13 @@ module.exports = NodeHelper.create({
 	getImages: function (self, baseDir, selectFromSubdirectories) {
 		var images = {}
 		images = new Array();
+<<<<<<< HEAD
 		console.log('Loading images...');
 
 		const photoDir = getPhotoDir(self, baseDir, selectFromSubdirectories);
+=======
+		const photoDir = self.getPhotoDir(self, baseDir, selectFromSubdirectories);
+>>>>>>> ac52277... more advances
 
 		recursive(photoDir, function (err, data) {
 			if (data !== undefined && data.length > 0) {
@@ -45,7 +49,11 @@ module.exports = NodeHelper.create({
 				return;
 			}
 
+<<<<<<< HEAD
 			console.log(`Loading ${images.length} images from dir ${photoDir}...`);
+=======
+			console.log(`Loaded ${images.length} images from dir '${photoDir}' ...`);
+>>>>>>> ac52277... more advances
 			self.sendSocketNotification('RANDOM_IMAGE_LIST', images);
 		});
 
