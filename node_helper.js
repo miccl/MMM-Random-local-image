@@ -14,21 +14,13 @@ module.exports = NodeHelper.create({
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === 'RANDOM_IMAGES_GET') {
 			var self = this;
-			self.getImages(self, payload.photoDir, payload.selectFromSubdirectories);
+			const photoDir = self.getPhotoDir(self, payload);
+			self.getImages(self, photoDir);
 		}
 	},
 
-	getImages: function (self, baseDir, selectFromSubdirectories) {
-		var images = {}
-		images = new Array();
-<<<<<<< HEAD
-		console.log('Loading images...');
-
-		const photoDir = getPhotoDir(self, baseDir, selectFromSubdirectories);
-=======
-		const photoDir = self.getPhotoDir(self, baseDir, selectFromSubdirectories);
->>>>>>> ac52277... more advances
-
+	getImages: function (self, photoDir) {
+		var images = new Array();
 		recursive(photoDir, function (err, data) {
 			if (data !== undefined && data.length > 0) {
 				for (i = 0; i < data.length; i++) {
@@ -49,30 +41,32 @@ module.exports = NodeHelper.create({
 				return;
 			}
 
-<<<<<<< HEAD
-			console.log(`Loading ${images.length} images from dir ${photoDir}...`);
-=======
 			console.log(`Loaded ${images.length} images from dir '${photoDir}' ...`);
->>>>>>> ac52277... more advances
 			self.sendSocketNotification('RANDOM_IMAGE_LIST', images);
 		});
 
 	},
 
-	getPhotoDir(self, baseDir, selectFromSubdirectories) {
+	getPhotoDir(self, payload) {
+		const baseDir = payload.photoDir;
 		// if subdirectories enbabled, pick a random subdirectory inside the photoDir instead the photoDir
-		if (selectFromSubdirectories) {
-			const subDirectories = self.getSubDirectories(baseDir);
+		if (payload.selectFromSubdirectories) {
+			const subDirectories = self.getSubDirectories(baseDir, payload.ignoreDirRegex);
+			if(subDirectories.length == 0) {
+				console.error(`no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex})`);
+				return baseDir;
+			}
 			const randomSubDirectory = subDirectories[Math.floor(Math.random() * subDirectories.length)];
 			return `${baseDir}/${randomSubDirectory}`;
 		}
 		return baseDir;
 	},
 
-	getSubDirectories(sourcePath) {
+	getSubDirectories(sourcePath, ignoreDirRegex) {
 		return fs.readdirSync(sourcePath, { withFileTypes: true })
 			.filter(dirent => dirent.isDirectory())
 			.map(dirent => dirent.name)
+			.filter(dirName => !dirName.match(ignoreDirRegex));
 	}
 
 });

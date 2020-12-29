@@ -55,3 +55,4 @@ The following properties can be configured:
 | `photoDir`                 | Local path to your photos. root dir is Magic-Mirror root directory. <br><br> **Possible Values:** Local path <br> **Default value:** ./modules/MMM-Random-local-image/photos/                              |
 | `showAdditionalInfo`       | Show image meta info. <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `true`                                                                                                       |
 | `selectFromSubdirectories` | The images are not selected from root dir (all possible images), but from a random subdirectory inside the root directory. <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `false` |
+| `ignoreDirRegex` | Regex for ignoring specifc subdirectories. Only in combiniation with selectFromSubdirectories 0 `true` <br><br> **Possible Values:** Regex expression <br> **Default value:** No ignored directories |

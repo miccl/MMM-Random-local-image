@@ -6,13 +6,14 @@
 
 Module.register("MMM-Random-local-image", {
   defaults: {
+    photoDir: "./modules/MMM-Random-local-image/photos/",
     photoUpdateInterval: 30 * 1000,
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
     selectFromSubdirectories: false,
+    ignoreDirRegex: "a^", // default matching nothing
     opacity: 1.0,
-    photoDir: "./modules/MMM-Random-local-image/photos/",
     showAdditionalInformation: true,
     maxWidth: "100%",
     maxHeight: "100%",
@@ -28,7 +29,7 @@ Module.register("MMM-Random-local-image", {
 
   start: function () {
     Log.info(`Module ${this.name} started...`);
-    Log.info("Display in order: " + (this.config.randomOrder ? "No" : "Yes"));
+    Log.info("Configuration: : " + this.config);
 
     this.error = null;
     if (!this.config.photoDir) {
@@ -43,6 +44,7 @@ Module.register("MMM-Random-local-image", {
       photoDir: this.config.photoDir,
       reloadUpdateInternval: this.config.reloadUpdateInternval,
       selectFromSubdirectories: this.config.selectFromSubdirectories,
+      ignoreDirRegex: this.config.ignoreDirRegex,
     });
   },
 
