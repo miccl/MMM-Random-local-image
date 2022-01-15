@@ -101,6 +101,7 @@ Module.register("MMM-Random-local-image", {
       this.initImageOrder(payload);
 
       if (!this.imageLoadFinished) {
+        this.loadNextImage();
         this.schedulePhotoUpdateInterval();
         this.schedulePhotoLoadUpdateInterval();
       }
@@ -122,11 +123,14 @@ Module.register("MMM-Random-local-image", {
   schedulePhotoUpdateInterval: function () {
     Log.info(`Scheduled update interval (${this.config.photoLoadUpdateInterval/1000}s)...`);
     setInterval(() => {
-      this.nextImageIndex();
-      this.updateDom();
+      this.loadNextImage();
     }, this.config.photoUpdateInterval);
   },
-
+  
+  loadNextImage: function () {
+    this.nextImageIndex();
+    this.updateDom();
+  },
   schedulePhotoLoadUpdateInterval: function () {
     Log.info(`Scheduled photo load update interval (${this.config.photoLoadUpdateInterval/1000}s)...`);
 
