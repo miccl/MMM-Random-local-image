@@ -67,6 +67,7 @@ Module.register("MMM-Random-local-image", {
     }
 
     wrapper.appendChild(this.createImageElement(image));
+    console.log(this.config.showAdditionalInformation)
     if (this.config.showAdditionalInformation) {
       wrapper.appendChild(this.createFilePathElement(image));
     }
