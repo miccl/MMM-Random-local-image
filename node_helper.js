@@ -27,7 +27,7 @@ module.exports = NodeHelper.create({
 					var photoFullPath = data[i];
 					// only show directory if a subdirectory is selected
 					var parentDirectory = path.basename(photoDir);
-					var photoRelativePath = parentDirectory + photoFullPath.substr(photoDir.length - 2);
+					var photoRelativePath = parentDirectory + '/' + photoFullPath.substr(photoDir.length - 2);
 					
 					if (isImage(photoFullPath)) {
 						images.push({
