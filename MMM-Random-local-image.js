@@ -14,7 +14,7 @@ Module.register("MMM-Random-local-image", {
     selectFromSubdirectories: false,
     ignoreDirRegex: "a^", // default matching nothing
     opacity: 1.0,
-    showAdditionalInformation: true,
+    showAdditionalInformation: false,
     maxWidth: "100%",
     maxHeight: "100%",
   },
@@ -117,7 +117,6 @@ Module.register("MMM-Random-local-image", {
       var orderArray = Array.from(Array(payload.length).keys());
       this.shuffle(orderArray);
       this.imageOrder = orderArray;
-      Log.info(`IMAGE ORDER: ${this.imageOrder}`);
     }
   },
 
