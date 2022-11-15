@@ -6,7 +6,7 @@
 
 Module.register("MMM-Random-local-image", {
   defaults: {
-    photoDir: "./modules/MMM-Random-local-image/photos/",
+    photoDir: "./modules/MMM-Random-local-image/exampleImages/",
     photoUpdateInterval: 30 * 1000,
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
