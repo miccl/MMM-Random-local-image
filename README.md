@@ -2,11 +2,11 @@
 
 A MagicMirror Module to show random images from a local folder on the Mirror.
 
-I for example mounted the images from a private cloud (which could be accessed as NFS).
-
 ## Screenshots
 
 Displaying image with additional information (path to the file)
+
+https://user-images.githubusercontent.com/12208766/201987800-9412e06d-5ef3-457e-be18-cb3d728b2f73.mov
 
 
 ## Installation
@@ -65,4 +65,4 @@ The following properties can be configured:
 | `opacity`                  | Opacity of the image <br><br> **Possible Values:** 0.0 to 1.0 <br> **Default value:** 1.0                                                                                                                  |
 | `showAdditionalInformation`       | Show image directory path <br><br> **Possible Values:** `true` or `false` <br> **Default value:** `false                                                                                                      |
 | `maxWidth`       | Maximal width of picture container <br><br> **Possible Values:** css values, e.g. 100%, 30px, 15em <br> **Default value:** 100%                                                                                                       |
-| `maxHeight`       | Maximal height of picture container <br><br> **Possible Values:** css values, e.g. 100%, 30px, 15em <br> **Default value:** 100%                                                                                                       |
+| `maxHeight`       | Maximal height of picture container <br><br> **Possible Values:** css values, e.g. 100%, 30px, 15em <br> **Default value:** 100%                                                                                                       
