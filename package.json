@@ -8,5 +8,12 @@
   "dependencies": {
     "is-image": "^2.0.0",
     "recursive-readdir": "^2.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  },
+  "scripts": {
+    "format": "prettier --check .",
+    "fix": "prettier --write ."
   }
 }

@@ -8,7 +8,7 @@ A MagicMirror Module to show random images from a local folder on the Mirror.
 
 In your terminal, go to your MagicMirror's Module folder:
 
-```
+```shell
 cd ~/MagicMirror/modules
 git clone https://github.com/miccl/MMM-Random-local-image.git
 cd MMM-Random-local-image
@@ -19,12 +19,12 @@ Configure the module in the `config.js` file (see ).
 
 ## Update
 
-In your tmerinal go into the module, pull the newest changes and install them:
+In your terminal go into the module, pull the newest changes and install them:
 
-```
+```shell
 cd ~/MagicMirror/modules/MMM-Random-local-image
 git pull
-npm ci 
+npm ci
 ```
 
 ## Using the module
@@ -35,7 +35,7 @@ To use this module, add it to the modules array in the `config/config.js` file:
 modules: [
   {
     module: "MMM-Random-local-image",
-    position: "fullscreen_below",
+    position: "bottom_right",
     config: {
       // see default values below
     },
@@ -48,9 +48,9 @@ modules: [
 The following properties can be configured:
 
 | Option                      | Description                                                                                                    | Possible Values                   | Default Value                                   |
-|-----------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------|-------------------------------------------------|
+| --------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------- | --- |
 | `photoDir`                  | Local path to your photos. root dir is Magic-Mirror root directory                                             | Local file path                   | ./modules/MMM-Random-local-image/exampleImages/ |
-| `photoUpdateInterval`       | How often a new photo is displayed                                                                             | A positive number of milliseconds | 30.000 (every 30 seconds)                       | |
+| `photoUpdateInterval`       | How often a new photo is displayed                                                                             | A positive number of milliseconds | 30.000 (every 30 seconds)                       |     |
 | `photoLoadInitialDelay`     | Initial delay of the image loading                                                                             | A positive number of milliseconds | 1000 (1 second)                                 |
 | `photoLoadUpdateInterval`   | Time between loading images                                                                                    | A positive number of milliseconds | 43200000 (every 12 hours)                       |
 | `randomOrder`               | Display images in random order                                                                                 | `true`or `false`                  | `true`                                          |
@@ -61,8 +61,8 @@ The following properties can be configured:
 | `maxWidth`                  | Maximal width of picture container                                                                             | css values, e.g. 100%, 30px, 15em | 100%                                            |
 | `maxHeight`                 | Maximal height of picture container                                                                            | css values, e.g. 100%, 30px, 15em | 100%                                            |
 
-**Hint**: The more images are in the `photoDir`, the longer the initial loading of the images takes. 
-As a workaround, you could use the `selectFromSubdirectories` setting, which selects a random folder in the `photoDir` and displays the images from the folder instead of loading all images from the `photoDir`. 
+**Hint**: The more images are in the `photoDir`, the longer the initial loading of the images takes.
+As a workaround, you could use the `selectFromSubdirectories` setting, which selects a random folder in the `photoDir` and displays the images from the folder instead of loading all images from the `photoDir`.
 This way you have the possibility to structure the images as well. I myself divide the pictures then in years.
 With the property `showAdditionalInformation` you can also show directly from which folder they originate.
 

@@ -67,7 +67,7 @@ Module.register("MMM-Random-local-image", {
     }
 
     wrapper.appendChild(this.createImageElement(image));
-    console.log(this.config.showAdditionalInformation)
+    console.log(this.config.showAdditionalInformation);
     if (this.config.showAdditionalInformation) {
       wrapper.appendChild(this.createFilePathElement(image));
     }
@@ -121,18 +121,22 @@ Module.register("MMM-Random-local-image", {
   },
 
   schedulePhotoUpdateInterval: function () {
-    Log.info(`Scheduled update interval (${this.config.photoLoadUpdateInterval/1000}s)...`);
+    Log.info(
+      `Scheduled update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
+    );
     setInterval(() => {
       this.loadNextImage();
     }, this.config.photoUpdateInterval);
   },
-  
+
   loadNextImage: function () {
     this.nextImageIndex();
     this.updateDom();
   },
   schedulePhotoLoadUpdateInterval: function () {
-    Log.info(`Scheduled photo load update interval (${this.config.photoLoadUpdateInterval/1000}s)...`);
+    Log.info(
+      `Scheduled photo load update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
+    );
 
     setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
   },
