@@ -47,10 +47,11 @@ modules: [
 
 The following properties can be configured:
 
+<!-- prettier-ignore -->
 | Option                      | Description                                                                                                    | Possible Values                   | Default Value                                   |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------- | --- |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------|-------------------------------------------------|
 | `photoDir`                  | Local path to your photos. root dir is Magic-Mirror root directory                                             | Local file path                   | ./modules/MMM-Random-local-image/exampleImages/ |
-| `photoUpdateInterval`       | How often a new photo is displayed                                                                             | A positive number of milliseconds | 30.000 (every 30 seconds)                       |     |
+| `photoUpdateInterval`       | How often a new photo is displayed                                                                             | A positive number of milliseconds | 30.000 (every 30 seconds)                       | |
 | `photoLoadInitialDelay`     | Initial delay of the image loading                                                                             | A positive number of milliseconds | 1000 (1 second)                                 |
 | `photoLoadUpdateInterval`   | Time between loading images                                                                                    | A positive number of milliseconds | 43200000 (every 12 hours)                       |
 | `randomOrder`               | Display images in random order                                                                                 | `true`or `false`                  | `true`                                          |
@@ -60,6 +61,8 @@ The following properties can be configured:
 | `showAdditionalInformation` | Show image directory path                                                                                      | `true` or `false`                 | `false                                          |
 | `maxWidth`                  | Maximal width of picture container                                                                             | css values, e.g. 100%, 30px, 15em | 100%                                            |
 | `maxHeight`                 | Maximal height of picture container                                                                            | css values, e.g. 100%, 30px, 15em | 100%                                            |
+
+<!-- prettier-ignore-end -->
 
 **Hint**: The more images are in the `photoDir`, the longer the initial loading of the images takes.
 As a workaround, you could use the `selectFromSubdirectories` setting, which selects a random folder in the `photoDir` and displays the images from the folder instead of loading all images from the `photoDir`.
