@@ -87,7 +87,7 @@ Module.register("MMM-Random-local-image", {
   createFilePathElement: function (image) {
     var element = document.createElement("div");
     // use styles from magic mirrors main.css
-    element.className = "dimm small regular";
+    element.className = "dimmed small regular";
     var node = document.createTextNode(image.relativePath);
     element.appendChild(node);
     return element;
