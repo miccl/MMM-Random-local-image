@@ -1,12 +1,12 @@
 # MagicMirror Module: MMM-Random-local-image
 
-A MagicMirror Module to show random images from a local folder on the Mirror.
+A [MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror) module that displays random images from a local folder on your mirror.
 
 ![Screenshot](.github/mmm-random-local-image.gif)
 
-## Installation
+## Installing the module
 
-In your terminal, go to your MagicMirror's Module folder:
+To install the module, clone the repo and install dependencies:
 
 ```shell
 cd ~/MagicMirror/modules
@@ -15,11 +15,11 @@ cd MMM-Random-local-image
 npm ci
 ```
 
-Configure the module in the `config.js` file (see ).
+Finally, configure the module in the config.js file (instructions below).
 
-## Update
+## Updating the module
 
-In your terminal go into the module, pull the newest changes and install them:
+To update the module to the latest version, pull the latest changes and reinstall the dependencies:
 
 ```shell
 cd ~/MagicMirror/modules/MMM-Random-local-image
@@ -29,7 +29,8 @@ npm ci
 
 ## Using the module
 
-To use this module, add it to the modules array in the `config/config.js` file:
+To use this module,
+add the following configuration to the modules array in your `config/config.js`:
 
 ```javascript
 modules: [
@@ -37,7 +38,7 @@ modules: [
     module: "MMM-Random-local-image",
     position: "bottom_right",
     config: {
-      // see default values below
+      // See configuration options below
     },
   },
 ];
@@ -48,42 +49,43 @@ modules: [
 The following properties can be configured:
 
 <!-- prettier-ignore -->
-| Option                      | Description                                                                                                    | Possible Values                   | Default Value                                   |
-|-----------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------|-------------------------------------------------|
-| `photoDir`                  | Local path to your photos. root dir is Magic-Mirror root directory                                             | Local file path                   | ./modules/MMM-Random-local-image/exampleImages/ |
-| `photoUpdateInterval`       | How often a new photo is displayed                                                                             | A positive number of milliseconds | 30.000 (every 30 seconds)                       | |
-| `photoLoadInitialDelay`     | Initial delay of the image loading                                                                             | A positive number of milliseconds | 1000 (1 second)                                 |
-| `photoLoadUpdateInterval`   | Time between loading images                                                                                    | A positive number of milliseconds | 43200000 (every 12 hours)                       |
-| `randomOrder`               | Display images in random order                                                                                 | `true`or `false`                  | `true`                                          |
-| `ignoreDirRegex`            | Regex for ignoring specifc subdirectories. Only in combination with selectFromSubdirectories = `true`          | Regex expression                  | "a^" (No ignored directories)                   |
-| `selectFromSubdirectories`  | Wether images are not selected from `photoDir`, but from a random subdirectory inside the `photoDir` directory | `true` or `false`                 | `false`                                         |
-| `opacity`                   | Opacity of the image                                                                                           | 0.0 to 1.0                        | 1.0                                             |
-| `showAdditionalInformation` | Show image directory path                                                                                      | `true` or `false`                 | `false                                          |
-| `maxWidth`                  | Maximal width of picture container                                                                             | css values, e.g. 100%, 30px, 15em | 100%                                            |
-| `maxHeight`                 | Maximal height of picture container                                                                            | css values, e.g. 100%, 30px, 15em | 100%                                            |
+| Option                      | Description                                                                                          | Possible Values              | Default Value                                   |
+|-----------------------------|------------------------------------------------------------------------------------------------------|------------------------------|-------------------------------------------------|
+| `photoDir`                  | Path to the folder containing your photos (relative to the MagicMirror root directory)               | Local file path              | ./modules/MMM-Random-local-image/exampleImages/ |
+| `photoUpdateInterval`       | Time interval between displayed photos                                                               | Positive integer (ms)        | 30.000 (every 30 seconds)                       |
+| `photoLoadInitialDelay`     | Initial delay before loading the first image                                                         | Positive integer (ms)        | 1000 (1 second)                                 |
+| `photoLoadUpdateInterval`   | Interval for refreshing the photo directory                                                          | Positive integer (ms)        | 43200000 (every 12 hours)                       |
+| `randomOrder`               | Whether to display images in random order                                                            | `true`or `false`             | `true`                                          |
+| `selectFromSubdirectories`  | Whether to select images from random subdirectories inside photoDir.                                | `true` or `false`            | `false`                                         |
+| `ignoreDirRegex`            | Regular expression for ignoring specific subdirectories (requires selectFromSubdirectories = `true`) | Regex string                 | "a^" (No ignored directories)                   |
+| `opacity`                   | Opacity of the displayed image                                                                       | 0.0 to 1.0                   | 1.0                                             |
+| `showAdditionalInformation` | Show the image’s directory path                                                                      | `true` or `false`            | `false`                                         |
+| `maxWidth`                  | Maximum width of image container                                                                     | css values (e.g. 100%, 30px) | 100%                                            |
+| `maxHeight`                 | Maximum height of image container                                                                    | css values (e.g. 100%, 30px) | 100%                                            |
 
 <!-- prettier-ignore-end -->
 
-**Hint**: The more images are in the `photoDir`, the longer the initial loading of the images takes.
-As a workaround, you could use the `selectFromSubdirectories` setting, which selects a random folder in the `photoDir` and displays the images from the folder instead of loading all images from the `photoDir`.
-This way you have the possibility to structure the images as well. I myself divide the pictures then in years.
-With the property `showAdditionalInformation` you can also show directly from which folder they originate.
+**Notes**:
 
-## Get images on your magic mirror
+- _Large photo directories_:
+  If your photoDir contains many images, the initial load time might increase.
+  To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory. 
+  You can organize images in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation`.
 
-There are several ways to get the files on your magic mirror.
+## Transferring Images to Your MagicMirror
 
-### A) Copy files
+Here are a few ways to upload photos to your MagicMirror:
 
-Copy the files directly on the magic mirror e.g. connect a usb, download from the web.
+### A) Direct copy
+
+Copy files directly to your MagicMirror system, for example, using a USB drive or downloading files from the web.
 
 ### B) NFS
 
-Use NSF to sync the files to your mirror. You need to configure a mounting point to your server/cloud in `/etc/fstab`.
-My entry looks like the following:
+Sync files using NFS. Configure a mounting point in /etc/fstab:
 
 ```
 192.xxx.2.xxx:/nfs/Public /home/pi/cloud/modules/MMM-Random-local-image/nfs_image_cloud nfs ro,soft,bg,intr,x-systemd.automount 0   0
 ```
 
-There are a lot of [sources](https://pimylifeup.com/raspberry-pi-nfs-client/) which describe the process.
+For detailed instructions, refer to the [Raspberry Pi NFS Client guide](https://pimylifeup.com/raspberry-pi-nfs-client/).
