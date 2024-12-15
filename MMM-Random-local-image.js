@@ -7,7 +7,7 @@
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
-    photoUpdateInterval: 30 * 1000,
+    photoUpdateInterval: 1 * 1000,
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
@@ -19,47 +19,44 @@ Module.register("MMM-Random-local-image", {
     maxHeight: "100%",
   },
 
-  // image loaded
   imageLoadFinished: false,
-  // loaded images
   images: [],
   imageIndex: 0,
   shownImagesCount: 0,
   imageOrder: [],
+  error: null,
 
   start: function () {
     Log.info(`Module ${this.name} started...`);
-    Log.info("Configuration: : " + this.config);
+    Log.debug("Configuration: : " + this.config);
 
-    this.error = null;
+    // TODO: check it for all configs and check type
     if (!this.config.photoDir) {
       this.error = "Missing required parameter 'photoDir'";
     }
-    // load images after some delay
-    setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
+
+    setTimeout(this.loadImages(), this.config.photoLoadInitialDelay);
   },
 
   loadImages: function () {
-    this.sendSocketNotification("RANDOM_IMAGES_GET", {
-      photoDir: this.config.photoDir,
-      reloadUpdateInternval: this.config.reloadUpdateInternval,
-      selectFromSubdirectories: this.config.selectFromSubdirectories,
-      ignoreDirRegex: this.config.ignoreDirRegex,
-    });
+    Log.info("Retrieving images...");
+    this.sendSocketNotification("RANDOM_IMAGES_GET", this.config);
   },
 
   getDom: function () {
-    var wrapper = document.createElement("div");
-    if (this.error != null) {
-      wrapper.innerHTML = this.translate(this.error);
-    }
-    if (!this.imageLoadFinished) {
-      wrapper.innerHTML = this.translate("LOADING");
+    const wrapper = document.createElement("div");
 
+    if (this.error) {
+      wrapper.innerHTML = this.translate(this.error);
       return wrapper;
     }
 
-    var image = this.images[this.imageIndex];
+    if (!this.imageLoadFinished) {
+      wrapper.innerHTML = this.translate("LOADING");
+      return wrapper;
+    }
+
+    const image = this.images[this.imageIndex];
     if (!image) {
       Log.error(`Could not load image (index: ${this.imageIndex})`);
       wrapper.innerHTML = this.translate("ERROR LOADING");
@@ -67,7 +64,6 @@ Module.register("MMM-Random-local-image", {
     }
 
     wrapper.appendChild(this.createImageElement(image));
-    console.log(this.config.showAdditionalInformation);
     if (this.config.showAdditionalInformation) {
       wrapper.appendChild(this.createFilePathElement(image));
     }
@@ -76,7 +72,7 @@ Module.register("MMM-Random-local-image", {
   },
 
   createImageElement: function (image) {
-    var element = document.createElement("img");
+    const element = document.createElement("img");
     element.src = image.fullPath;
     element.style.maxWidth = this.config.maxWidth;
     element.style.maxHeight = this.config.maxHeight;
@@ -85,17 +81,16 @@ Module.register("MMM-Random-local-image", {
   },
 
   createFilePathElement: function (image) {
-    var element = document.createElement("div");
-    // use styles from magic mirrors main.css
-    element.className = "dimmed small regular";
-    var node = document.createTextNode(image.relativePath);
+    const element = document.createElement("div");
+    element.className = "dimmed small regular"; // use styles from magic mirrors main.css
+    const node = document.createTextNode(image.relativePath);
     element.appendChild(node);
     return element;
   },
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGE_LIST") {
-      Log.info("Image received...");
+      Log.debug("Image received...");
 
       // init
       this.images = payload;
@@ -114,14 +109,14 @@ Module.register("MMM-Random-local-image", {
   initImageOrder: function (payload) {
     this.shownImagesCount = 0;
     if (this.config.randomOrder) {
-      var orderArray = Array.from(Array(payload.length).keys());
+      const orderArray = Array.from(Array(payload.length).keys());
       this.shuffle(orderArray);
       this.imageOrder = orderArray;
     }
   },
 
   schedulePhotoUpdateInterval: function () {
-    Log.info(
+    Log.debug(
       `Scheduled update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
     );
     setInterval(() => {
@@ -133,8 +128,9 @@ Module.register("MMM-Random-local-image", {
     this.nextImageIndex();
     this.updateDom();
   },
+
   schedulePhotoLoadUpdateInterval: function () {
-    Log.info(
+    Log.debug(
       `Scheduled photo load update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
     );
 
@@ -146,13 +142,13 @@ Module.register("MMM-Random-local-image", {
       ? this.imageOrder[this.shownImagesCount]
       : this.shownImagesCount;
 
-    Log.info(`Number of image shown: ${this.shownImagesCount}`);
-    Log.info(`Current image index: ${this.imageIndex}`);
+    Log.debug(`Number of image shown: ${this.shownImagesCount}`);
+    Log.debug(`Current image index: ${this.imageIndex}`);
 
     // all images shown? --> reset counter, initial new image load
     if (this.shownImagesCount === this.images.length - 1) {
       this.shownImagesCount = 0;
-      this.loadImages();
+      // this.loadImages(); // TODO: add config that after all photos are run out, it loads another bunch
       return;
     }
 
@@ -166,8 +162,8 @@ Module.register("MMM-Random-local-image", {
    * @return {String}      The first item in the shuffled array
    */
   shuffle: function (array) {
-    var currentIndex = array.length;
-    var temporaryValue, randomIndex;
+    let currentIndex = array.length;
+    let temporaryValue, randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
