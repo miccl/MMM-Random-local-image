@@ -36,9 +36,62 @@ Module.register("MMM-Random-local-image", {
     setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
   },
 
+  /**
+   * Triggers node_helper.js to load the images from the disk
+   */
   loadImages: function () {
     Log.info("Retrieving images...");
     this.sendSocketNotification("RANDOM_IMAGES_GET", this.config);
+  },
+
+  /**
+   * Receives images from node_helper.js
+   * @param notification type of the notification
+   * @param payload images
+   */
+  socketNotificationReceived: function (notification, payload) {
+    if (notification === "RANDOM_IMAGE_LIST") {
+      // init
+      this.images = payload;
+      this.imageIndex = -1;
+      if (this.config.randomOrder) {
+        shuffle(this.images);
+      }
+      Log.info(`Received ${this.images.length} images`);
+
+      const isFirstTime = this.initialImageLoadingFinished;
+
+      this.initialImageLoadingFinished = true;
+      this.loadNextImage();
+
+      // TODO: make it simpler
+      if (isFirstTime) {
+        setInterval(
+          () => this.loadNextImage(),
+          this.config.photoUpdateInterval,
+        );
+        setInterval(
+          () => this.loadImages(),
+          this.config.photoLoadUpdateInterval,
+        );
+      }
+    }
+  },
+
+  loadNextImage: function () {
+    this.setNextImage();
+    this.updateDom(); // built-in function
+  },
+
+  // TODO: do functional
+  setNextImage: function () {
+    this.imageIndex = this.imageIndex + 1;
+    // all images shown? --> reset counter, initial new image load
+    if (this.imageIndex > this.images.length - 1) {
+      this.imageIndex = 0;
+      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
+    }
+    Log.info(`Current image index: ${this.imageIndex}`);
   },
 
   getDom: function () {
@@ -84,51 +137,6 @@ Module.register("MMM-Random-local-image", {
     const node = document.createTextNode(image.relativePath);
     element.appendChild(node);
     return element;
-  },
-
-  socketNotificationReceived: function (notification, payload) {
-    if (notification === "RANDOM_IMAGE_LIST") {
-      // init
-      this.images = payload;
-      this.imageIndex = -1;
-      if (this.config.randomOrder) {
-        shuffle(this.images);
-      }
-      Log.info(`Received ${this.images.length} images`);
-
-      const isFirstTime = this.initialImageLoadingFinished;
-
-      this.initialImageLoadingFinished = true;
-      this.loadNextImage();
-
-      // TODO: make it simpler
-      if (isFirstTime) {
-        setInterval(
-          () => this.loadNextImage(),
-          this.config.photoUpdateInterval,
-        );
-        setInterval(
-          () => this.loadImages(),
-          this.config.photoLoadUpdateInterval,
-        );
-      }
-    }
-  },
-
-  loadNextImage: function () {
-    this.setNextImage();
-    this.updateDom(); // built-in function
-  },
-
-  // TODO: do functional
-  setNextImage: function () {
-    this.imageIndex = this.imageIndex + 1;
-    // all images shown? --> reset counter, initial new image load
-    if (this.imageIndex > this.images.length - 1) {
-      this.imageIndex = 0;
-      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
-    }
-    Log.info(`Current image index: ${this.imageIndex}`);
   },
 });
 
