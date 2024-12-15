@@ -22,7 +22,7 @@ module.exports = NodeHelper.create({
     var images = new Array();
     recursive(photoDir, function (err, data) {
       if (data !== undefined && data.length > 0) {
-        for (i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           var photoFullPath = data[i];
           // only show directory if a subdirectory is selected
           var parentDirectory = path.basename(photoDir);

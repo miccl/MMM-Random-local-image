@@ -10,10 +10,16 @@
     "recursive-readdir": "^2.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.13.0",
     "prettier": "^3.4.2"
   },
   "scripts": {
-    "format": "prettier --check .",
-    "fix": "prettier --write ."
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier --write ."
   }
 }
