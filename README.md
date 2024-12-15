@@ -69,7 +69,7 @@ The following properties can be configured:
 
 - _Large photo directories_:
   If your photoDir contains many images, the initial load time might increase.
-  To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory. 
+  To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory.
   You can organize images in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation`.
 
 ## Transferring Images to Your MagicMirror
