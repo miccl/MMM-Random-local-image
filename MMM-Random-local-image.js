@@ -7,7 +7,7 @@
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
-    photoUpdateInterval: 1 * 1000,
+    photoUpdateInterval: 30 * 1000,
     photoLoadInitialDelay: 1000,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
@@ -19,11 +19,9 @@ Module.register("MMM-Random-local-image", {
     maxHeight: "100%",
   },
 
-  imageLoadFinished: false,
+  initialImageLoadingFinished: false,
   images: [],
   imageIndex: 0,
-  shownImagesCount: 0,
-  imageOrder: [],
   error: null,
 
   start: function () {
@@ -35,7 +33,7 @@ Module.register("MMM-Random-local-image", {
       this.error = "Missing required parameter 'photoDir'";
     }
 
-    setTimeout(this.loadImages(), this.config.photoLoadInitialDelay);
+    setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
   },
 
   loadImages: function () {
@@ -51,7 +49,7 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
-    if (!this.imageLoadFinished) {
+    if (!this.initialImageLoadingFinished) {
       wrapper.innerHTML = this.translate("LOADING");
       return wrapper;
     }
@@ -90,93 +88,71 @@ Module.register("MMM-Random-local-image", {
 
   socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGE_LIST") {
-      Log.debug("Image received...");
-
       // init
       this.images = payload;
-      this.initImageOrder(payload);
-
-      if (!this.imageLoadFinished) {
-        this.loadNextImage();
-        this.schedulePhotoUpdateInterval();
-        this.schedulePhotoLoadUpdateInterval();
+      this.imageIndex = -1;
+      if (this.config.randomOrder) {
+        shuffle(this.images);
       }
+      Log.info(`Received ${this.images.length} images`);
 
-      this.imageLoadFinished = true;
-    }
-  },
+      const isFirstTime = this.initialImageLoadingFinished;
 
-  initImageOrder: function (payload) {
-    this.shownImagesCount = 0;
-    if (this.config.randomOrder) {
-      const orderArray = Array.from(Array(payload.length).keys());
-      this.shuffle(orderArray);
-      this.imageOrder = orderArray;
-    }
-  },
-
-  schedulePhotoUpdateInterval: function () {
-    Log.debug(
-      `Scheduled update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
-    );
-    setInterval(() => {
+      this.initialImageLoadingFinished = true;
       this.loadNextImage();
-    }, this.config.photoUpdateInterval);
+
+      // TODO: make it simpler
+      if (isFirstTime) {
+        setInterval(
+          () => this.loadNextImage(),
+          this.config.photoUpdateInterval,
+        );
+        setInterval(
+          () => this.loadImages(),
+          this.config.photoLoadUpdateInterval,
+        );
+      }
+    }
   },
 
   loadNextImage: function () {
-    this.nextImageIndex();
-    this.updateDom();
+    this.setNextImage();
+    this.updateDom(); // built-in function
   },
 
-  schedulePhotoLoadUpdateInterval: function () {
-    Log.debug(
-      `Scheduled photo load update interval (${this.config.photoLoadUpdateInterval / 1000}s)...`,
-    );
-
-    setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
-  },
-
-  nextImageIndex: function () {
-    this.imageIndex = this.config.randomOrder
-      ? this.imageOrder[this.shownImagesCount]
-      : this.shownImagesCount;
-
-    Log.debug(`Number of image shown: ${this.shownImagesCount}`);
-    Log.debug(`Current image index: ${this.imageIndex}`);
-
+  // TODO: do functional
+  setNextImage: function () {
+    this.imageIndex = this.imageIndex + 1;
     // all images shown? --> reset counter, initial new image load
-    if (this.shownImagesCount === this.images.length - 1) {
-      this.shownImagesCount = 0;
-      // this.loadImages(); // TODO: add config that after all photos are run out, it loads another bunch
-      return;
+    if (this.imageIndex > this.images.length - 1) {
+      this.imageIndex = 0;
+      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
     }
-
-    this.shownImagesCount++;
-  },
-
-  /**
-   * Randomly shuffle an array
-   * https://stackoverflow.com/a/2450976/1293256
-   * @param  {Array} array The array to shuffle
-   * @return {String}      The first item in the shuffled array
-   */
-  shuffle: function (array) {
-    let currentIndex = array.length;
-    let temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
-    }
-
-    return array;
+    Log.info(`Current image index: ${this.imageIndex}`);
   },
 });
+
+/**
+ * Randomly shuffle an array
+ * https://stackoverflow.com/a/2450976/1293256
+ * @param  {Array} array The array to shuffle
+ * @return {String}      The first item in the shuffled array
+ */
+function shuffle(array) {
+  let currentIndex = array.length;
+  let temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
