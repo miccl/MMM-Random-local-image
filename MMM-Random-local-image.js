@@ -64,7 +64,6 @@ Module.register("MMM-Random-local-image", {
       this.initialImageLoadingFinished = true;
       this.loadNextImage();
 
-      // TODO: make it simpler
       if (isFirstTime) {
         setInterval(
           () => this.loadNextImage(),
@@ -79,19 +78,24 @@ Module.register("MMM-Random-local-image", {
   },
 
   loadNextImage: function () {
-    this.setNextImage();
+    const allImagesShown = this.setNextImage();
+    Log.info(`Current image index: ${this.imageIndex}`);
+    if (allImagesShown) {
+      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
+    }
     this.updateDom(); // built-in function
   },
 
-  // TODO: do functional
   setNextImage: function () {
+    const nextIndex = this.imageIndex + 1;
     this.imageIndex = this.imageIndex + 1;
-    // all images shown? --> reset counter, initial new image load
+    // all images shown? --> reset counter
     if (this.imageIndex > this.images.length - 1) {
       this.imageIndex = 0;
-      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
+      return true;
     }
-    Log.info(`Current image index: ${this.imageIndex}`);
+    this.imageIndex = nextIndex;
+    return false;
   },
 
   getDom: function () {
