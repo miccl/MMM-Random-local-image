@@ -59,7 +59,7 @@ Module.register("MMM-Random-local-image", {
       }
       Log.info(`Received ${this.images.length} images`);
 
-      const isFirstTime = this.initialImageLoadingFinished;
+      const isFirstTime = !this.initialImageLoadingFinished;
 
       this.initialImageLoadingFinished = true;
       this.loadNextImage();
