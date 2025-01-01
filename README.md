@@ -89,3 +89,11 @@ Sync files using NFS. Configure a mounting point in /etc/fstab:
 ```
 
 For detailed instructions, refer to the [Raspberry Pi NFS Client guide](https://pimylifeup.com/raspberry-pi-nfs-client/).
+
+# Changelog
+
+The followings lists relevant changes for using the module: 
+
+## 2024-12
+
+- Fixed initial loading bug (PR https://github.com/miccl/MMM-Random-local-image/pull/9)
