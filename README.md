@@ -56,7 +56,7 @@ The following properties can be configured:
 | `photoLoadInitialDelay`     | Initial delay before loading the first image                                                         | Positive integer (ms)        | 1000 (1 second)                                 |
 | `photoLoadUpdateInterval`   | Interval for refreshing the photo directory                                                          | Positive integer (ms)        | 43200000 (every 12 hours)                       |
 | `randomOrder`               | Whether to display images in random order                                                            | `true`or `false`             | `true`                                          |
-| `selectFromSubdirectories`  | Whether to select images from random subdirectories inside photoDir.                                | `true` or `false`            | `false`                                         |
+| `selectFromSubdirectories`  | Whether to select images from random subdirectories inside photoDir.                                 | `true` or `false`            | `false`                                         |
 | `ignoreDirRegex`            | Regular expression for ignoring specific subdirectories (requires selectFromSubdirectories = `true`) | Regex string                 | "a^" (No ignored directories)                   |
 | `opacity`                   | Opacity of the displayed image                                                                       | 0.0 to 1.0                   | 1.0                                             |
 | `showAdditionalInformation` | Show the image’s directory path                                                                      | `true` or `false`            | `false`                                         |
@@ -65,22 +65,24 @@ The following properties can be configured:
 
 <!-- prettier-ignore-end -->
 
-**Notes**:
+## Notes
 
-- _Large photo directories_:
-  If your photoDir contains many images, the initial load time might increase.
-  To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory.
-  You can organize images in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation`.
+### Large photo directories
 
-## Transferring Images to Your MagicMirror
+If your photoDir contains many images, the initial load time might increase.
+To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory.
+
+You can organize images in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation` (shown in the example video).
+
+### Transferring images to your MagicMirror
 
 Here are a few ways to upload photos to your MagicMirror:
 
-### A) Direct copy
+#### A) Direct copy
 
 Copy files directly to your MagicMirror system, for example, using a USB drive or downloading files from the web.
 
-### B) NFS
+#### B) NFS
 
 Sync files using NFS. Configure a mounting point in /etc/fstab:
 
@@ -90,10 +92,10 @@ Sync files using NFS. Configure a mounting point in /etc/fstab:
 
 For detailed instructions, refer to the [Raspberry Pi NFS Client guide](https://pimylifeup.com/raspberry-pi-nfs-client/).
 
-# Changelog
+## Changelog
 
-The followings lists relevant changes for using the module: 
+The followings lists relevant changes for using the module:
 
-## 2024-12
+### 2024-12
 
 - Fixed initial loading bug (PR https://github.com/miccl/MMM-Random-local-image/pull/9)
