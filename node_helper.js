@@ -7,7 +7,7 @@ const fs = require("fs");
 
 module.exports = NodeHelper.create({
   init: function () {
-    console.log("Initializing module helper ...");
+    console.log("Initializing Random-local-image module helper ...");
   },
 
   socketNotificationReceived: function (notification, payload) {
