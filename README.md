@@ -44,7 +44,7 @@ modules: [
 ];
 ```
 
-## Configuration options
+### Configuration options
 
 The following properties can be configured:
 
@@ -66,24 +66,24 @@ The following properties can be configured:
 
 <!-- prettier-ignore-end -->
 
-## Notes
+### Notes
 
-### Large photo directories
+#### Large photo directories
 
 If your photoDir contains many images and video, the initial load time might increase.
 To address this, use selectFromSubdirectories to load them from a randomly selected subdirectory.
 
 You can organize media files in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation` (shown in the example video).
 
-### Transferring files to your MagicMirror
+#### Transferring files to your MagicMirror
 
 Here are a few ways to upload photos to your MagicMirror:
 
-#### A) Direct copy
+##### A) Direct copy
 
 Copy files directly to your MagicMirror system, for example, using a USB drive or downloading files from the web.
 
-#### B) NFS
+##### B) NFS
 
 Sync files using NFS. Configure a mounting point in /etc/fstab:
 
