@@ -1,7 +1,7 @@
-var NodeHelper = require("node_helper");
-var recursive = require("recursive-readdir");
-var isImage = require("is-image");
+const NodeHelper = require("node_helper");
+const recursive = require("recursive-readdir");
 
+const mime = require("mime-types");
 const path = require("path");
 const fs = require("fs");
 
@@ -13,12 +13,12 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function (notification, payload) {
     if (notification === "RANDOM_IMAGES_GET") {
       var self = this;
-      const photoDir = self.getPhotoDir(self, payload);
-      self.getImages(self, photoDir);
+      self.getImages(self, payload);
     }
   },
 
-  getImages: function (self, photoDir) {
+  getImages: function (self, options) {
+    const photoDir = self.getPhotoDir(self, options);
     var images = new Array();
     recursive(photoDir, function (err, data) {
       if (data !== undefined && data.length > 0) {
@@ -26,13 +26,14 @@ module.exports = NodeHelper.create({
           var photoFullPath = data[i];
           // only show directory if a subdirectory is selected
           var parentDirectory = path.basename(photoDir);
-          var photoRelativePath =
-            parentDirectory + "/" + photoFullPath.substr(photoDir.length - 2);
+          var photoRelativePath = `${parentDirectory}/${photoFullPath.slice(photoDir.length - 2)}`;
 
-          if (isImage(photoFullPath)) {
+          const mediaType = detectMediaFile(photoFullPath, options);
+          if (mediaType) {
             images.push({
               fullPath: photoFullPath,
               relativePath: photoRelativePath,
+              mimeType: mediaType.mimeType,
             });
           }
         }
@@ -75,3 +76,15 @@ module.exports = NodeHelper.create({
       .filter((dirName) => !dirName.match(ignoreDirRegex));
   },
 });
+
+function detectMediaFile(filePath, options) {
+  const mimeType = mime.lookup(filePath);
+  const fileType = mimeType.split("/")[0];
+  if (fileType === "image") {
+    return { type: "image", mimeType: mimeType };
+  }
+  if (!options.ignoreVideos && fileType === "video") {
+    return { type: "video", mimeType: mimeType };
+  }
+  return null;
+}
