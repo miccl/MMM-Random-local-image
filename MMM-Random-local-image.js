@@ -12,6 +12,7 @@ Module.register("MMM-Random-local-image", {
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
     randomOrder: true,
     selectFromSubdirectories: false,
+    ignoreVideos: false,
     ignoreDirRegex: "a^", // default matching nothing
     opacity: 1.0,
     showAdditionalInformation: false,
@@ -79,7 +80,6 @@ Module.register("MMM-Random-local-image", {
 
   loadNextImage: function () {
     const allImagesShown = this.setNextImage();
-    Log.info(`Current image index: ${this.imageIndex}`);
     if (allImagesShown) {
       // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
     }
@@ -127,7 +127,13 @@ Module.register("MMM-Random-local-image", {
   },
 
   createImageElement: function (image) {
-    const element = document.createElement("img");
+    const mediaType = image.mimeType.split("/")[0];
+    let element = document.createElement("img");
+    if (mediaType === "video") {
+      element = document.createElement("video");
+      element.type = image.mime;
+    }
+
     element.src = image.fullPath;
     element.style.maxWidth = this.config.maxWidth;
     element.style.maxHeight = this.config.maxHeight;

@@ -1,8 +1,8 @@
 # MagicMirror Module: MMM-Random-local-image
 
-A [MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror) module that displays random images from a local folder on your mirror.
+A [MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror) module that displays random images and videos from a local folder on your mirror.
 
-![Screenshot](.github/mmm-random-local-image.gif)
+![Screenshot](.github/demo.gif)
 
 ## Installing the module
 
@@ -51,17 +51,18 @@ The following properties can be configured:
 <!-- prettier-ignore -->
 | Option                      | Description                                                                                          | Possible Values              | Default Value                                   |
 |-----------------------------|------------------------------------------------------------------------------------------------------|------------------------------|-------------------------------------------------|
-| `photoDir`                  | Path to the folder containing your photos (relative to the MagicMirror root directory)               | Local file path              | ./modules/MMM-Random-local-image/exampleImages/ |
-| `photoUpdateInterval`       | Time interval between displayed photos                                                               | Positive integer (ms)        | 30.000 (every 30 seconds)                       |
-| `photoLoadInitialDelay`     | Initial delay before loading the first image                                                         | Positive integer (ms)        | 1000 (1 second)                                 |
-| `photoLoadUpdateInterval`   | Interval for refreshing the photo directory                                                          | Positive integer (ms)        | 43200000 (every 12 hours)                       |
-| `randomOrder`               | Whether to display images in random order                                                            | `true`or `false`             | `true`                                          |
-| `selectFromSubdirectories`  | Whether to select images from random subdirectories inside photoDir.                                 | `true` or `false`            | `false`                                         |
+| `photoDir`                  | Path to the folder containing your media (relative to the MagicMirror root directory)                | Local file path              | ./modules/MMM-Random-local-image/exampleImages/ |
+| `photoUpdateInterval`       | Time interval between displayed media                                                                | Positive integer (ms)        | 30.000 (every 30 seconds)                       |
+| `photoLoadInitialDelay`     | Initial delay before loading the first media                                                         | Positive integer (ms)        | 1000 (1 second)                                 |
+| `photoLoadUpdateInterval`   | Interval for refreshing the media directory                                                          | Positive integer (ms)        | 43200000 (every 12 hours)                       |
+| `randomOrder`               | Whether to display medias in random order                                                            | `true` or `false`            | `true`                                          |
+| `selectFromSubdirectories`  | Whether to select medias from random subdirectories inside photoDir.                                 | `true` or `false`            | `false`                                         |
 | `ignoreDirRegex`            | Regular expression for ignoring specific subdirectories (requires selectFromSubdirectories = `true`) | Regex string                 | "a^" (No ignored directories)                   |
-| `opacity`                   | Opacity of the displayed image                                                                       | 0.0 to 1.0                   | 1.0                                             |
-| `showAdditionalInformation` | Show the image’s directory path                                                                      | `true` or `false`            | `false`                                         |
-| `maxWidth`                  | Maximum width of image container                                                                     | css values (e.g. 100%, 30px) | 100%                                            |
-| `maxHeight`                 | Maximum height of image container                                                                    | css values (e.g. 100%, 30px) | 100%                                            |
+| `ignoreVideos`              | Wether to ignore videos                                                                              | `true` or `false`            | `false`                                         |                  |
+| `opacity`                   | Opacity of the displayed media                                                                       | 0.0 to 1.0                   | 1.0                                             |
+| `showAdditionalInformation` | Show the media’s directory path                                                                      | `true` or `false`            | `false`                                         |
+| `maxWidth`                  | Maximum width of media container                                                                     | css values (e.g. 100%, 30px) | 100%                                            |
+| `maxHeight`                 | Maximum height of media container                                                                    | css values (e.g. 100%, 30px) | 100%                                            |
 
 <!-- prettier-ignore-end -->
 
@@ -69,12 +70,12 @@ The following properties can be configured:
 
 ### Large photo directories
 
-If your photoDir contains many images, the initial load time might increase.
-To address this, use selectFromSubdirectories to load images from a randomly selected subdirectory.
+If your photoDir contains many images and video, the initial load time might increase.
+To address this, use selectFromSubdirectories to load them from a randomly selected subdirectory.
 
-You can organize images in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation` (shown in the example video).
+You can organize media files in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation` (shown in the example video).
 
-### Transferring images to your MagicMirror
+### Transferring files to your MagicMirror
 
 Here are a few ways to upload photos to your MagicMirror:
 
@@ -95,6 +96,10 @@ For detailed instructions, refer to the [Raspberry Pi NFS Client guide](https://
 ## Changelog
 
 The followings lists relevant changes for using the module:
+
+### 2025-02-07
+
+- Added support for displaying videos
 
 ### 2024-12
 
