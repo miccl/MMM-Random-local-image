@@ -51,29 +51,35 @@ Module.register("MMM-Random-local-image", {
    * @param payload images
    */
   socketNotificationReceived: function (notification, payload) {
-    if (notification === "RANDOM_IMAGE_LIST") {
-      // init
-      this.images = payload;
-      this.imageIndex = -1;
-      if (this.config.randomOrder) {
-        shuffle(this.images);
+    if (notification === "RANDOM_IMAGES_CHUNK") {
+      this.images = payload.isFirstChunk
+        ? payload.images
+        : this.images.concat(payload.images);
+
+      if (payload.isFirstChunk) {
+        this.imageIndex = -1;
+        if (this.config.randomOrder) {
+          this.images = shuffle(this.images);
+        }
+
+        const isFirstTime = !this.initialImageLoadingFinished;
+        this.initialImageLoadingFinished = true;
+        this.loadNextImage();
+
+        if (isFirstTime) {
+          setInterval(
+            () => this.loadNextImage(),
+            this.config.photoUpdateInterval,
+          );
+          setInterval(
+            () => this.loadImages(),
+            this.config.photoLoadUpdateInterval,
+          );
+        }
       }
-      Log.info(`Received ${this.images.length} images`);
 
-      const isFirstTime = !this.initialImageLoadingFinished;
-
-      this.initialImageLoadingFinished = true;
-      this.loadNextImage();
-
-      if (isFirstTime) {
-        setInterval(
-          () => this.loadNextImage(),
-          this.config.photoUpdateInterval,
-        );
-        setInterval(
-          () => this.loadImages(),
-          this.config.photoLoadUpdateInterval,
-        );
+      if (payload.isLastChunk && this.config.randomOrder) {
+        this.images = shuffle(this.images);
       }
     }
   },

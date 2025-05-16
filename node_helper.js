@@ -5,59 +5,79 @@ const mime = require("mime-types");
 const path = require("path");
 const fs = require("fs");
 
+const NOTIFICATION_TYPE = {
+  GET_IMAGES: "RANDOM_IMAGES_GET",
+  IMAGES_CHUNK: "RANDOM_IMAGES_CHUNK"
+};
+
+const CHUNK_SIZE = 10;
+
 module.exports = NodeHelper.create({
-  init: function () {
+  init: function() {
     console.log("Initializing Random-local-image module helper ...");
   },
 
-  socketNotificationReceived: function (notification, payload) {
-    if (notification === "RANDOM_IMAGES_GET") {
+  socketNotificationReceived: function(notification, payload) {
+    if (notification === NOTIFICATION_TYPE.GET_IMAGES) {
       var self = this;
       self.getImages(self, payload);
     }
   },
 
-  getImages: function (self, options) {
+  getImages: function(self, options) {
     const photoDir = self.getPhotoDir(self, options);
-    var images = new Array();
-    recursive(photoDir, function (err, data) {
-      if (data !== undefined && data.length > 0) {
-        for (let i = 0; i < data.length; i++) {
-          var photoFullPath = data[i];
-          // only show directory if a subdirectory is selected
-          var parentDirectory = path.basename(photoDir);
-          var photoRelativePath = `${parentDirectory}/${photoFullPath.slice(photoDir.length - 2)}`;
 
-          const mediaType = detectMediaFile(photoFullPath, options);
-          if (mediaType) {
-            images.push({
-              fullPath: photoFullPath,
-              relativePath: photoRelativePath,
-              mimeType: mediaType.mimeType,
-            });
-          }
-        }
-      } else {
+    let currentChunk = [];
+    let isFirstChunk = true;
+
+    recursive(photoDir, function(err, data) {
+      if (data === undefined || data.length === 0) {
         console.log(`No files found in ${photoDir}`);
         return;
       }
 
-      console.log(`Loaded ${images.length} images from dir '${photoDir}' ...`);
-      self.sendSocketNotification("RANDOM_IMAGE_LIST", images);
+      for (const fileFullPath of data) {
+        const file = processFilePath(photoDir, fileFullPath, options);
+        if (!file) {
+          continue;
+        }
+        currentChunk.push(file);
+
+        if (currentChunk.length === CHUNK_SIZE) {
+          self.sendSocketNotification(NOTIFICATION_TYPE.GET_IMAGES, {
+            images: currentChunk,
+            isFirstChunk,
+            isLastChunk: false
+          });
+          isFirstChunk = false;
+          currentChunk = [];
+        }
+      }
+
+      self.sendSocketNotification("RANDOM_IMAGES_CHUNK", {
+        images: currentChunk,
+        isFirstChunk,
+        isLastChunk: true
+      });
+      currentChunk = [];
+
+      console.log(
+        `Processing complete for ${data.length} files in dir '${photoDir}'`
+      );
     });
   },
 
   getPhotoDir(self, payload) {
     const baseDir = payload.photoDir;
-    // if subdirectories enbabled, pick a random subdirectory inside the photoDir instead the photoDir
+    // if subdirectories enbabled, pick a random subdirectory inside the photoDir instead of the fileDir
     if (payload.selectFromSubdirectories) {
       const subDirectories = self.getSubDirectories(
         baseDir,
-        payload.ignoreDirRegex,
+        payload.ignoreDirRegex
       );
-      if (subDirectories.length == 0) {
+      if (subDirectories.length === 0) {
         console.error(
-          `no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex})`,
+          `no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex})`
         );
         return baseDir;
       }
@@ -74,17 +94,32 @@ module.exports = NodeHelper.create({
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
       .filter((dirName) => !dirName.match(ignoreDirRegex));
-  },
+  }
 });
+
+function processFilePath(photoDir, fullPath, options) {
+  const mimeType = detectMediaFile(fullPath, options);
+  if (!mimeType) {
+    return null;
+  }
+
+  const parentDirectory = path.basename(photoDir);
+
+  return {
+    fullPath,
+    relativePath: `${parentDirectory}/${fullPath.slice(photoDir.length - 2)}`,
+    mimeType
+  };
+}
 
 function detectMediaFile(filePath, options) {
   const mimeType = mime.lookup(filePath);
   const fileType = mimeType.split("/")[0];
   if (fileType === "image") {
-    return { type: "image", mimeType: mimeType };
+    return mimeType;
   }
   if (!options.ignoreVideos && fileType === "video") {
-    return { type: "video", mimeType: mimeType };
+    return mimeType;
   }
   return null;
 }
