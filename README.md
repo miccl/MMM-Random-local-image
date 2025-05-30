@@ -60,7 +60,7 @@ The following properties can be configured:
 | `ignoreDirRegex`            | Regular expression for ignoring specific subdirectories (requires selectFromSubdirectories = `true`) | Regex string                 | "a^" (No ignored directories)                   |
 | `ignoreVideos`              | Wether to ignore videos                                                                              | `true` or `false`            | `false`                                         |                  |
 | `opacity`                   | Opacity of the displayed media                                                                       | 0.0 to 1.0                   | 1.0                                             |
-| `showAdditionalInformation` | Show the media’s directory path                                                                      | `true` or `false`            | `false`                                         |
+| `showAdditionalInformation` | Show the media’s directory path                                                                      | `true` or `false`            | `true`                                         |
 | `maxWidth`                  | Maximum width of media container                                                                     | css values (e.g. 100%, 30px) | 100%                                            |
 | `maxHeight`                 | Maximum height of media container                                                                    | css values (e.g. 100%, 30px) | 100%                                            |
 
@@ -92,15 +92,3 @@ Sync files using NFS. Configure a mounting point in /etc/fstab:
 ```
 
 For detailed instructions, refer to the [Raspberry Pi NFS Client guide](https://pimylifeup.com/raspberry-pi-nfs-client/).
-
-## Changelog
-
-The followings lists relevant changes for using the module:
-
-### 2025-02-07
-
-- Added support for displaying videos
-
-### 2024-12
-
-- Fixed initial loading bug (PR https://github.com/miccl/MMM-Random-local-image/pull/9)
