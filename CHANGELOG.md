@@ -4,11 +4,17 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.1.0] - Ongoing
+## [1.2.0] - 2025-05-31
+
+### Added
+
+- Display of the number of files already shown and the total number of files in the directory
 
 ### Changed
 
 - Improve loading files (loading and sending files in chunk to decrease initial loading delay, especially for many files)
+- Set the default value of `showAdditionalInformations` to true
+- Moved changelog from README.md into CHANGELOG.md
 
 ## [1.1.0] - 2025-02-07
 

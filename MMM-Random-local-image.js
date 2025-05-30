@@ -7,21 +7,22 @@
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
-    photoUpdateInterval: 30 * 1000,
-    photoLoadInitialDelay: 1000,
-    photoLoadUpdateInterval: 12 * 60 * 60 * 1000,
+    photoUpdateInterval: 30 * 1000, // 30 seconds
+    photoLoadInitialDelay: 1000, // 1 second
+    photoLoadUpdateInterval: 12 * 60 * 60 * 1000, // 12 hours
     randomOrder: true,
     selectFromSubdirectories: false,
     ignoreVideos: false,
     ignoreDirRegex: "a^", // default matching nothing
     opacity: 1.0,
-    showAdditionalInformation: false,
+    showAdditionalInformation: true,
     maxWidth: "100%",
     maxHeight: "100%",
   },
 
   initialImageLoadingFinished: false,
   images: [],
+  totalImages: 0,
   imageIndex: 0,
   error: null,
 
@@ -57,6 +58,7 @@ Module.register("MMM-Random-local-image", {
         : this.images.concat(payload.images);
 
       if (payload.isFirstChunk) {
+        this.totalImages = payload.images.length;
         this.imageIndex = -1;
         if (this.config.randomOrder) {
           this.images = shuffle(this.images);
@@ -76,8 +78,13 @@ Module.register("MMM-Random-local-image", {
             this.config.photoLoadUpdateInterval,
           );
         }
+        return;
       }
 
+      // Add to totalImages for subsequent chunks
+      this.totalImages += payload.images.length;
+
+      // If this is the last chunk, shuffle the images if random order is enable
       if (payload.isLastChunk && this.config.randomOrder) {
         this.images = shuffle(this.images);
       }
@@ -87,20 +94,24 @@ Module.register("MMM-Random-local-image", {
   loadNextImage: function () {
     const allImagesShown = this.setNextImage();
     if (allImagesShown) {
-      // this.loadImages(); // TODO: add option to add this code line (load new images when all pictures where shown)
+      this.loadImages(); // Automatically reload images when all have been shown
+      return;
     }
     this.updateDom(); // built-in function
   },
 
   setNextImage: function () {
-    const nextIndex = this.imageIndex + 1;
-    this.imageIndex = this.imageIndex + 1;
-    // all images shown? --> reset counter
-    if (this.imageIndex > this.images.length - 1) {
+    // Remove the current image from the list after showing
+    if (this.images.length > 0 && this.imageIndex >= 0) {
+      this.images.splice(this.imageIndex, 1);
+    }
+    // If no images left, reset
+    if (this.images.length === 0) {
       this.imageIndex = 0;
       return true;
     }
-    this.imageIndex = nextIndex;
+    // Always show the next image at index 0
+    this.imageIndex = 0;
     return false;
   },
 
@@ -127,6 +138,13 @@ Module.register("MMM-Random-local-image", {
     wrapper.appendChild(this.createImageElement(image));
     if (this.config.showAdditionalInformation) {
       wrapper.appendChild(this.createFilePathElement(image));
+      // Calculate correct photo count info
+      const shown = this.totalImages - this.images.length + 1;
+      const total = this.totalImages;
+      const info = document.createElement("div");
+      info.className = "dimmed small regular";
+      info.innerText = `File ${shown} of ${total}`;
+      wrapper.appendChild(info);
     }
 
     return wrapper;

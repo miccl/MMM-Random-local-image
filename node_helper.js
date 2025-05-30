@@ -7,30 +7,30 @@ const fs = require("fs");
 
 const NOTIFICATION_TYPE = {
   GET_IMAGES: "RANDOM_IMAGES_GET",
-  IMAGES_CHUNK: "RANDOM_IMAGES_CHUNK"
+  IMAGES_CHUNK: "RANDOM_IMAGES_CHUNK",
 };
 
-const CHUNK_SIZE = 10;
+const CHUNK_SIZE = 50;
 
 module.exports = NodeHelper.create({
-  init: function() {
+  init: function () {
     console.log("Initializing Random-local-image module helper ...");
   },
 
-  socketNotificationReceived: function(notification, payload) {
+  socketNotificationReceived: function (notification, payload) {
     if (notification === NOTIFICATION_TYPE.GET_IMAGES) {
       var self = this;
       self.getImages(self, payload);
     }
   },
 
-  getImages: function(self, options) {
+  getImages: function (self, options) {
     const photoDir = self.getPhotoDir(self, options);
 
     let currentChunk = [];
     let isFirstChunk = true;
 
-    recursive(photoDir, function(err, data) {
+    recursive(photoDir, function (err, data) {
       if (data === undefined || data.length === 0) {
         console.log(`No files found in ${photoDir}`);
         return;
@@ -44,25 +44,25 @@ module.exports = NodeHelper.create({
         currentChunk.push(file);
 
         if (currentChunk.length === CHUNK_SIZE) {
-          self.sendSocketNotification(NOTIFICATION_TYPE.GET_IMAGES, {
+          self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
             images: currentChunk,
             isFirstChunk,
-            isLastChunk: false
+            isLastChunk: false,
           });
           isFirstChunk = false;
           currentChunk = [];
         }
       }
 
-      self.sendSocketNotification("RANDOM_IMAGES_CHUNK", {
+      self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
         images: currentChunk,
         isFirstChunk,
-        isLastChunk: true
+        isLastChunk: true,
       });
       currentChunk = [];
 
       console.log(
-        `Processing complete for ${data.length} files in dir '${photoDir}'`
+        `Processing complete for ${data.length} files in dir '${photoDir}'`,
       );
     });
   },
@@ -73,11 +73,11 @@ module.exports = NodeHelper.create({
     if (payload.selectFromSubdirectories) {
       const subDirectories = self.getSubDirectories(
         baseDir,
-        payload.ignoreDirRegex
+        payload.ignoreDirRegex,
       );
       if (subDirectories.length === 0) {
         console.error(
-          `no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex})`
+          `no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex})`,
         );
         return baseDir;
       }
@@ -94,7 +94,7 @@ module.exports = NodeHelper.create({
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name)
       .filter((dirName) => !dirName.match(ignoreDirRegex));
-  }
+  },
 });
 
 function processFilePath(photoDir, fullPath, options) {
@@ -108,7 +108,7 @@ function processFilePath(photoDir, fullPath, options) {
   return {
     fullPath,
     relativePath: `${parentDirectory}/${fullPath.slice(photoDir.length - 2)}`,
-    mimeType
+    mimeType,
   };
 }
 
