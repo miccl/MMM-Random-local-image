@@ -137,14 +137,7 @@ Module.register("MMM-Random-local-image", {
 
     wrapper.appendChild(this.createImageElement(image));
     if (this.config.showAdditionalInformation) {
-      wrapper.appendChild(this.createFilePathElement(image));
-      // Calculate correct photo count info
-      const shown = this.totalImages - this.images.length + 1;
-      const total = this.totalImages;
-      const info = document.createElement("div");
-      info.className = "dimmed small regular";
-      info.innerText = `File ${shown} of ${total}`;
-      wrapper.appendChild(info);
+      wrapper.appendChild(this.createInfoElement(image));
     }
 
     return wrapper;
@@ -165,10 +158,14 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  createFilePathElement: function (image) {
+  createInfoElement: function (image) {
+    const shown = this.totalImages - this.images.length + 1;
+    const total = this.totalImages;
     const element = document.createElement("div");
     element.className = "dimmed small regular"; // use styles from magic mirrors main.css
-    const node = document.createTextNode(image.relativePath);
+    const node = document.createTextNode(
+      image.relativePath + ` (${shown}/${total})`,
+    );
     element.appendChild(node);
     return element;
   },
