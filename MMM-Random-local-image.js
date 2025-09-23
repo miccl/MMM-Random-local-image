@@ -171,6 +171,9 @@ Module.register("MMM-Random-local-image", {
   },
 });
 
+// Export shuffle for test usage
+module.exports = { shuffle };
+
 /**
  * Randomly shuffle an array
  * https://stackoverflow.com/a/2450976/1293256
