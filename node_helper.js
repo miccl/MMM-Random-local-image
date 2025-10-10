@@ -114,6 +114,9 @@ function processFilePath(photoDir, fullPath, options) {
 
 function detectMediaFile(filePath, options) {
   const mimeType = mime.lookup(filePath);
+  if (!mimeType) {
+    return null;
+  }
   const fileType = mimeType.split("/")[0];
   if (fileType === "image") {
     return mimeType;
