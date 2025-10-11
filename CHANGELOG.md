@@ -4,6 +4,22 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.0] - 2025-23-10
+
+### Added
+
+- Display file creation date with configurable format
+- New template-based approach for displaying additional information
+  - Added `infoTemplate` option with support for placeholders:
+    - `{{date}}` - The creation date of the media file (formatted according to `dateFormat`)
+    - `{{currentCount}}` - The current position in the media sequence
+    - `{{totalCount}}` - The total number of media files
+  - Configurable date format with `dateFormat` option (YYYY-MM-DD, MM/DD/YYYY, DD.MM.YYYY)
+
+### Fixed
+
+- ignore files with unknown mime type (previously threw an error)
+
 ## [1.2.0] - 2025-05-31
 
 ### Added
