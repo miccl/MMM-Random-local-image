@@ -18,6 +18,9 @@ Module.register("MMM-Random-local-image", {
     showAdditionalInformation: true,
     maxWidth: "100%",
     maxHeight: "100%",
+    // Template for additional information display
+    infoTemplate: "{{date}}", // Template for additional information
+    dateFormat: "DD.MM.YYYY", // Format options: YYYY-MM-DD, MM/DD/YYYY, DD.MM.YYYY, etc.
   },
 
   initialImageLoadingFinished: false,
@@ -159,15 +162,50 @@ Module.register("MMM-Random-local-image", {
   },
 
   createInfoElement: function (image) {
-    const shown = this.totalImages - this.images.length + 1;
-    const total = this.totalImages;
     const element = document.createElement("div");
     element.className = "dimmed small regular"; // use styles from magic mirrors main.css
-    const node = document.createTextNode(
-      image.relativePath + ` (${shown}/${total})`,
-    );
+
+    const infoText = this.processInfoTemplate(image);
+
+    const node = document.createTextNode(infoText);
     element.appendChild(node);
     return element;
+  },
+
+  processInfoTemplate: function (image) {
+    const dateObj = new Date(image.creationDate);
+    const values = {
+      date: this.formatDate(dateObj, this.config.dateFormat),
+      currentCount: this.totalImages - this.images.length + 1,
+      totalCount: this.totalImages,
+    };
+
+    let result = this.config.infoTemplate;
+
+    // Replace each placeholder with its corresponding value
+    Object.keys(values).forEach((key) => {
+      const placeholder = new RegExp(`{{${key}}}`, "g");
+      result = result.replace(placeholder, values[key]);
+    });
+
+    return result;
+  },
+
+  formatDate: function (date, format) {
+    // Simple date formatter
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    switch (format) {
+      case "MM/DD/YYYY":
+        return `${month}/${day}/${year}`;
+      case "DD.MM.YYYY":
+        return `${day}.${month}.${year}`;
+      case "YYYY-MM-DD":
+      default:
+        return `${year}-${month}-${day}`;
+    }
   },
 });
 

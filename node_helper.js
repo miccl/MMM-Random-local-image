@@ -105,10 +105,15 @@ function processFilePath(photoDir, fullPath, options) {
 
   const parentDirectory = path.basename(photoDir);
 
+  // Get file stats to extract creation date
+  const stats = fs.statSync(fullPath);
+  const creationDate = stats.birthtime;
+
   return {
     fullPath,
     relativePath: `${parentDirectory}/${fullPath.slice(photoDir.length - 2)}`,
     mimeType,
+    creationDate,
   };
 }
 
