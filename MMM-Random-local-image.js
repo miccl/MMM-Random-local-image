@@ -12,15 +12,14 @@ Module.register("MMM-Random-local-image", {
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000, // 12 hours
     randomOrder: true,
     selectFromSubdirectories: false,
-    ignoreVideos: false,
+    ignoreVideos: true,
     ignoreDirRegex: "a^", // default matching nothing
     opacity: 1.0,
-    showAdditionalInformation: true,
+    showAdditionalInformation: false,
     maxWidth: "100%",
     maxHeight: "100%",
-    // Template for additional information display
-    infoTemplate: "{{date}}", // Template for additional information
-    dateFormat: "DD.MM.YYYY", // Format options: YYYY-MM-DD, MM/DD/YYYY, DD.MM.YYYY, etc.
+    infoTemplate: "{{date}}",
+    dateFormat: "DD.MM.YYYY",
   },
 
   initialImageLoadingFinished: false,
@@ -76,10 +75,14 @@ Module.register("MMM-Random-local-image", {
             () => this.loadNextImage(),
             this.config.photoUpdateInterval,
           );
-          setInterval(
-            () => this.loadImages(),
-            this.config.photoLoadUpdateInterval,
-          );
+
+          // only need to refresh when there are subdirecto
+          if (this.config.selectFromSubdirectories) {
+            setInterval(
+              () => this.loadImages(),
+              this.config.photoLoadUpdateInterval,
+            );
+          }
         }
         return;
       }
