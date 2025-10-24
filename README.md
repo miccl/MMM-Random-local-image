@@ -27,6 +27,8 @@ git pull
 npm ci
 ```
 
+Check the [Changelog](CHANGELOG.md) for all updates.
+
 ## Using the module
 
 To use this module,
@@ -44,31 +46,40 @@ modules: [
 ];
 ```
 
-### Configuration options
+## Configuration options
 
 The following properties can be configured:
 
-<!-- prettier-ignore -->
-| Option                      | Description                                                                                          | Possible Values                          | Default Value                                   |
-|-----------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------|-------------------------------------------------|
-| `photoDir`                  | Path to the folder containing your media (relative to the MagicMirror root directory)                | Local file path                          | ./modules/MMM-Random-local-image/exampleImages/ |
-| `photoUpdateInterval`       | Time interval between displayed media                                                                | Positive integer (ms)                    | 30.000 (every 30 seconds)                       |
-| `photoLoadInitialDelay`     | Initial delay before loading the first media                                                         | Positive integer (ms)                    | 1000 (1 second)                                 |
-| `photoLoadUpdateInterval`   | Interval for refreshing the media directory                                                          | Positive integer (ms)                    | 43200000 (every 12 hours)                       |
-| `randomOrder`               | Whether to display medias in random order                                                            | `true` or `false`                        | `true`                                          |
-| `selectFromSubdirectories`  | Whether to select medias from random subdirectories inside photoDir.                                 | `true` or `false`                        | `false`                                         |
-| `ignoreDirRegex`            | Regular expression for ignoring specific subdirectories (requires selectFromSubdirectories = `true`) | Regex string                             | "a^" (No ignored directories)                   |
-| `ignoreVideos`              | Wether to ignore videos                                                                              | `true` or `false`                        | `false`                                         |                  |
-| `opacity`                   | Opacity of the displayed media                                                                       | 0.0 to 1.0                               | 1.0                                             |
-| `showAdditionalInformation` | Show additional information about the media                                                          | `true` or `false`                        | `true`                                          |
-| `maxWidth`                  | Maximum width of media container                                                                     | css values (e.g. 100%, 30px)             | 100%                                            |
-| `maxHeight`                 | Maximum height of media container                                                                    | css values (e.g. 100%, 30px)             | 100%                                            |
-| `infoTemplate`              | Template string for formatting the additional information display                                    | String with placeholders                 | "{{date}}"                                      |
-| `dateFormat`                | Format for displaying the date                                                                       | `YYYY-MM-DD`, `MM/DD/YYYY`, `DD.MM.YYYY` | `DD.MM.YYYY`                                    |
+#### General
 
-<!-- prettier-ignore-end -->
+| Option                  | Description                                                  | Possible Values      | Default Value                                   |
+| ----------------------- | ------------------------------------------------------------ | -------------------- | ----------------------------------------------- |
+| `photoDir`              | Folder containing your media (relative to MM root directory) | Local file path      | ./modules/MMM-Random-local-image/exampleImages/ |
+| `photoUpdateInterval`   | Time interval between displayed media                        | Positive number (ms) | 30.000 (every 30 seconds)                       |
+| `photoLoadInitialDelay` | Initial delay before loading the first media                 | Positive number (ms) | 1000 (1 second)                                 |
+| `randomOrder`           | Whether to display medias in random order                    | `true` or `false`    | `true`                                          |
+| `ignoreVideos`          | Wether to ignore videos                                      | `true` or `false`    | `true`                                          |
 
-### Template Placeholders
+### Media from Subdirectories
+
+If your `photoDir` contains many images and videos, loading may take minutes instead of seconds.
+To speed this up, organize your media files into folders (e.g., by year) and enable `selectFromSubdirectories` to load files from a random subdirectory.
+
+| Option                     | Description                                                          | Possible Values      | Default Value                 |
+| -------------------------- | -------------------------------------------------------------------- | -------------------- | ----------------------------- |
+| `selectFromSubdirectories` | Whether to select medias from random subdirectories inside photoDir. | `true` or `false`    | `false`                       |
+| `ignoreDirRegex`           | Regular expression for ignoring specific subdirectories              | Regex string         | "a^" (No ignored directories) |
+| `photoLoadUpdateInterval`  | Interval for changing the subdirectory                               | Positive number (ms) | 43200000 (every 12 hours)     |
+
+### Media subcaption
+
+Add a subcaption to each media (see the example video above)
+
+| Option                      | Description                                                       | Possible Values                          | Default Value |
+| --------------------------- | ----------------------------------------------------------------- | ---------------------------------------- | ------------- |
+| `showAdditionalInformation` | Show additional information about the media                       | `true` or `false`                        | `false`       |
+| `infoTemplate`              | Template string for formatting the additional information display | String with placeholders                 | "{{date}}"    |
+| `dateFormat`                | Format for displaying the date                                    | `YYYY-MM-DD`, `MM/DD/YYYY`, `DD.MM.YYYY` | `DD.MM.YYYY`  |
 
 The `infoTemplate` option supports the following placeholders:
 
@@ -80,20 +91,23 @@ The `infoTemplate` option supports the following placeholders:
 
 Example templates:
 
-- `"{{date}}"` - Shows only the date
-- `"Image {{currentCount}}/{{totalCount}}"` - Shows position
-- `"Created on {{date}} ({{currentCount}}/{{totalCount}})"` - Shows date and position
+- `"Created on {{date}}"` - Shows only the date
+- `"Image {{currentCount}} of {{totalCount}}"` - Shows position
+- `"{{date}} ({{currentCount}} of {{totalCount}})"` - Shows date and position (used in the video above)
 
 If you have ideas for more useful templates, just create an issue with a suggestion.
 
+### Styling
+
+Style the media container using CSS.
+
+| Option      | Description                       | Possible Values              | Default Value |
+| ----------- | --------------------------------- | ---------------------------- | ------------- |
+| `opacity`   | Opacity of the displayed media    | 0.0 to 1.0                   | 1.0           |
+| `maxWidth`  | Maximum width of media container  | css values (e.g. 100%, 30px) | 100%          |
+| `maxHeight` | Maximum height of media container | css values (e.g. 100%, 30px) | 100%          |
+
 ### Notes
-
-#### Large photo directories
-
-If your photoDir contains many images and video, the initial load time might increase.
-To address this, use selectFromSubdirectories to load them from a randomly selected subdirectory.
-
-You can organize media files in folders (e.g., by year) for better structure and display the origin using the property `showAdditionalInformation` (shown in the example video).
 
 #### Transferring files to your MagicMirror
 
