@@ -4,6 +4,14 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Changed
+
+- Using more sensitive default values
+  - `showAdditionalInformations` to false (in regards to issue #10)
+  - `ignoreVideos` to true (prevents unintented huge videos to be loaded)
+
 ## [1.3.0] - 2025-23-10
 
 ### Added
