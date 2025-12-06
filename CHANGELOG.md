@@ -6,13 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Added option for a backup dir to display media when `photoDir` has no files or is unreadable.
+- Will show error images directly on the mirror when the app runs into an error.
+
 ### Changed
 
 - Using more sensitive default values
   - `showAdditionalInformations` to false (in regards to issue #10)
   - `ignoreVideos` to true (prevents unintented huge videos to be loaded)
 
-## [1.3.0] - 2025-23-10
+### Fixed
+
+- Prevent crash when enumerating subdirectories in getPhotoDir
+- Improve hasFilesInDirectory robustness by handling ENOENT gracefully and logging other filesystem errors
+
+## [1.3.0] - 2025-10-23
 
 ### Added
 
@@ -37,7 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Improve loading files (loading and sending files in chunk to decrease initial loading delay, especially for many files)
-- Set the default value of `showAdditionalInformations` to true
+- Set the default value of `showAdditionalInformation` to true
 - Moved changelog from README.md into CHANGELOG.md
 
 ## [1.1.0] - 2025-02-07
