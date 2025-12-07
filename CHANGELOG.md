@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added option for a backup dir to display media when `photoDir` has no files or is unreadable.
+- Add option for a backup dir to display media when `photoDir` has no files or is unreadable.
 - Will show error images directly on the mirror when the app runs into an error.
 
 ### Changed
@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Using more sensitive default values
   - `showAdditionalInformations` to false (in regards to issue #10)
   - `ignoreVideos` to true (prevents unintented huge videos to be loaded)
+- Improve filtering of files which should improve performance
 
 ### Fixed
 
