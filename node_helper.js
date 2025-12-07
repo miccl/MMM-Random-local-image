@@ -86,7 +86,7 @@ function getMediaDir(payload, self) {
       `Nothing found in photoDir: ${payload.photoDir}, trying backupDir...`,
     );
     if (payload.backupDir) {
-      photoDir = hasFilesInDirectory(payload.backupDir, payload)
+      photoDir = hasMediaFilesInDirectory(payload.backupDir, payload)
         ? payload.backupDir
         : payload.errorDir;
       setTimeout(() => self.getImages(self, payload), 60 * 1000);
@@ -99,7 +99,7 @@ function getDirByPath(payload) {
   const baseDir = payload.photoDir;
 
   if (!payload.selectFromSubdirectories) {
-    return hasFilesInDirectory(baseDir, payload) ? baseDir : null;
+    return hasMediaFilesInDirectory(baseDir, payload) ? baseDir : null;
   }
 
   let subDirectories = [];
@@ -148,17 +148,19 @@ function processFilePath(photoDir, fullPath) {
   };
 }
 
-// TODO: improve that it returns true for the first red valid file
-function hasFilesInDirectory(dirPath, options) {
+function hasMediaFilesInDirectory(dirPath, options) {
   try {
-    const files = fs
-      .readdirSync(dirPath, { withFileTypes: true })
-      .filter(
-        (dirent) => dirent.isFile() && isImageOrVideo(dirent.name, options),
-      );
+    const dir = fs.opendirSync(dirPath);
+    let dirent;
+    while ((dirent = dir.readSync()) !== null) {
+      if (dirent.isFile() && isImageOrVideo(dirent.name, options)) {
+        dir.closeSync();
+        return true; // Found one, exit immediately
+      }
+    }
 
-    // TODO: filter only relevant files
-    return files.length > 0;
+    dir.closeSync();
+    return false;
   } catch (err) {
     if (err.code !== "ENOENT") {
       // if the error exists, but it still throws an error
@@ -190,7 +192,7 @@ function selectRandomSubdirectoryPath(subDirectories, baseDir, payload) {
     const randomSubDirectory =
       subDirectories[Math.floor(Math.random() * subDirectories.length)];
     subDirectoryPath = path.join(baseDir, randomSubDirectory);
-    if (hasFilesInDirectory(subDirectoryPath, payload)) {
+    if (hasMediaFilesInDirectory(subDirectoryPath, payload)) {
       return subDirectoryPath;
     }
     tries--;
