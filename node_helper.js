@@ -25,75 +25,81 @@ module.exports = NodeHelper.create({
   },
 
   getImages: function (self, payload) {
-    let photoDir = getPhotoDir(payload);
-    if (!photoDir) {
-      console.log(
-        `Nothing found in photoDir: ${payload.photoDir}, trying backupDir...`,
-      );
-      if (payload.backupDir) {
-        if (hasFilesInDirectory(payload.backupDir)) {
-          photoDir = payload.backupDir;
-        } else {
-          photoDir = payload.errorDir; // TODO: instead of giving the dir, just give a specific photo
+    let photoDir = getMediaDir(payload, self);
+
+    recursive(
+      photoDir,
+      [(file, dirent) => dirent.isFile() && isImageOrVideo(dirent.name)],
+      function (err, data) {
+        if (err) {
+          console.error("Error reading directory recursively:", err);
+          return;
         }
 
-        setTimeout(() => self.getImages(self, payload), 60 * 1000);
-      }
-    }
-
-    recursive(photoDir, function (err, data) {
-      if (err) {
-        console.error("Error reading directory recursively:", err);
-        return;
-      }
-
-      if (data === undefined || data.length === 0) {
-        console.log(`No files found in ${photoDir}`);
-        return;
-      }
-
-      let currentChunk = [];
-      let isFirstChunk = true;
-
-      for (const fileFullPath of data) {
-        const file = processFilePath(photoDir, fileFullPath, payload);
-        if (!file) {
-          continue;
+        if (data === undefined || data.length === 0) {
+          console.log(`No files found in ${photoDir}`);
+          return; // TOOO: return error file
         }
-        currentChunk.push(file);
 
-        if (currentChunk.length === CHUNK_SIZE) {
+        let currentChunk = [];
+        let isFirstChunk = true;
+
+        for (const fileFullPath of data) {
+          const file = processFilePath(photoDir, fileFullPath);
+          if (!file) {
+            continue;
+          }
+          currentChunk.push(file);
+
+          if (currentChunk.length === CHUNK_SIZE) {
+            self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
+              images: currentChunk,
+              isFirstChunk,
+              isLastChunk: false,
+            });
+            isFirstChunk = false;
+            currentChunk = [];
+          }
+        }
+
+        if (currentChunk.length > 0 || isFirstChunk) {
           self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
             images: currentChunk,
             isFirstChunk,
-            isLastChunk: false,
+            isLastChunk: true,
           });
-          isFirstChunk = false;
-          currentChunk = [];
         }
-      }
 
-      if (currentChunk.length > 0 || isFirstChunk) {
-        self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
-          images: currentChunk,
-          isFirstChunk,
-          isLastChunk: true,
-        });
-      }
-
-      console.log(
-        `Processing complete for ${data.length} files in dir '${photoDir}'`,
-      );
-    });
+        console.log(
+          `Processing complete for ${data.length} files in dir '${photoDir}'`,
+        );
+      },
+    );
   },
 });
 
-// TODO: make it using three parameters
-function getPhotoDir(payload) {
+function getMediaDir(payload, self) {
+  let photoDir = getDirByPath(payload);
+
+  if (!photoDir) {
+    console.log(
+      `Nothing found in photoDir: ${payload.photoDir}, trying backupDir...`,
+    );
+    if (payload.backupDir) {
+      photoDir = hasFilesInDirectory(payload.backupDir, payload)
+        ? payload.backupDir
+        : payload.errorDir;
+      setTimeout(() => self.getImages(self, payload), 60 * 1000);
+    }
+  }
+  return photoDir;
+}
+
+function getDirByPath(payload) {
   const baseDir = payload.photoDir;
 
   if (!payload.selectFromSubdirectories) {
-    return hasFilesInDirectory(baseDir) ? baseDir : null;
+    return hasFilesInDirectory(baseDir, payload) ? baseDir : null;
   }
 
   let subDirectories = [];
@@ -111,7 +117,7 @@ function getPhotoDir(payload) {
     return null;
   }
 
-  return selectRandomSubdirectoryPath(subDirectories, baseDir);
+  return selectRandomSubdirectoryPath(subDirectories, baseDir, payload);
 }
 
 function getSubDirectories(sourcePath, ignoreDirRegex) {
@@ -122,8 +128,8 @@ function getSubDirectories(sourcePath, ignoreDirRegex) {
     .filter((dirName) => !dirName.match(ignoreDirRegex));
 }
 
-function processFilePath(photoDir, fullPath, options) {
-  const mimeType = detectMediaFile(fullPath, options);
+function processFilePath(photoDir, fullPath) {
+  const mimeType = mime.lookup(fullPath);
   if (!mimeType) {
     return null;
   }
@@ -142,26 +148,14 @@ function processFilePath(photoDir, fullPath, options) {
   };
 }
 
-function detectMediaFile(filePath, options) {
-  const mimeType = mime.lookup(filePath);
-  if (!mimeType) {
-    return null;
-  }
-  const fileType = mimeType.split("/")[0];
-  if (fileType === "image") {
-    return mimeType;
-  }
-  if (!options.ignoreVideos && fileType === "video") {
-    return mimeType;
-  }
-  return null;
-}
-
-function hasFilesInDirectory(dirPath) {
+// TODO: improve that it returns true for the first red valid file
+function hasFilesInDirectory(dirPath, options) {
   try {
     const files = fs
       .readdirSync(dirPath, { withFileTypes: true })
-      .filter((dirent) => dirent.isFile());
+      .filter(
+        (dirent) => dirent.isFile() && isImageOrVideo(dirent.name, options),
+      );
 
     // TODO: filter only relevant files
     return files.length > 0;
@@ -174,18 +168,29 @@ function hasFilesInDirectory(dirPath) {
   }
 }
 
+function isImageOrVideo(fileName, options) {
+  const mimeType = mime.lookup(fileName);
+  if (!mimeType) {
+    return false;
+  }
+  const fileType = mimeType.split("/")[0];
+  return (
+    fileType === "image" || (!options.ignoreVideos && fileType === "video")
+  );
+}
+
 /**
  * Picks a random non-empty subdirectory.
  * Returns the path of the subdirectory, otherwise null.
  */
-function selectRandomSubdirectoryPath(subDirectories, baseDir) {
+function selectRandomSubdirectoryPath(subDirectories, baseDir, payload) {
   let subDirectoryPath = null;
   let tries = 5;
   do {
     const randomSubDirectory =
       subDirectories[Math.floor(Math.random() * subDirectories.length)];
     subDirectoryPath = path.join(baseDir, randomSubDirectory);
-    if (hasFilesInDirectory(subDirectoryPath)) {
+    if (hasFilesInDirectory(subDirectoryPath, payload)) {
       return subDirectoryPath;
     }
     tries--;
