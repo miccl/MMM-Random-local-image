@@ -40,3 +40,8 @@ jspm_packages
 .node_repl_history
 
 photos
+
+# Ignore rollup output
+MMM-Random-local-image.js
+node_helper.js
+

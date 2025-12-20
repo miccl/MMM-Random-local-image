@@ -4,6 +4,8 @@
  * Module: MMM-Random-local-image
  */
 
+import * as Log from "logger";
+
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
@@ -16,7 +18,7 @@ Module.register("MMM-Random-local-image", {
     selectFromSubdirectories: false,
     ignoreVideos: true,
     ignoreDirRegex: "a^", // default matching nothing
-    opacity: 1.0,
+    opacity: 1,
     showAdditionalInformation: false,
     maxWidth: "100%",
     maxHeight: "100%",
@@ -151,9 +153,9 @@ Module.register("MMM-Random-local-image", {
     return wrapper;
   },
 
-  createImageElement: function (image) {
+  createImageElement: function (image: any) {
     const mediaType = image.mimeType.split("/")[0];
-    let element = document.createElement("img");
+    let element = document.createElement("img") as any;
     if (mediaType === "video") {
       element = document.createElement("video");
       element.type = image.mime;
@@ -166,7 +168,7 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  createInfoElement: function (image) {
+  createInfoElement: function (image: any) {
     const element = document.createElement("div");
     element.className = "dimmed small regular"; // use styles from magic mirrors main.css
 
@@ -177,7 +179,7 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  processInfoTemplate: function (image) {
+  processInfoTemplate: function (image: any) {
     const dateObj = new Date(image.creationDate);
     const values = {
       date: this.formatDate(dateObj, this.config.dateFormat),
@@ -190,13 +192,14 @@ Module.register("MMM-Random-local-image", {
     // Replace each placeholder with its corresponding value
     Object.keys(values).forEach((key) => {
       const placeholder = new RegExp(`{{${key}}}`, "g");
+      // @ts-ignore
       result = result.replace(placeholder, values[key]);
     });
 
     return result;
   },
 
-  formatDate: function (date, format) {
+  formatDate: function (date: any, format: any) {
     // Simple date formatter
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -220,7 +223,7 @@ Module.register("MMM-Random-local-image", {
  * @param  {Array} array The array to shuffle
  * @return {String}      The first item in the shuffled array
  */
-function shuffle(array) {
+function shuffle(array: any) {
   let currentIndex = array.length;
   let temporaryValue, randomIndex;
 

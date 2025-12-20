@@ -2,24 +2,37 @@
   "name": "mmm-random-local-image",
   "version": "1.0.0",
   "description": "Shows a random image from local folder",
-  "main": "MMM-Random-local-image.js",
+  "main": "src/MMM-Random-local-image.js",
   "author": "miccl",
   "license": "ISC",
+  "scripts": {
+    "lint": "eslint . --fix && prettier --write .",
+    "lint:check": "eslint . && prettier --check .",
+    "postinstall": "npm run build",
+    "build": "rollup -c",
+    "dev": "rollup -c --sourcemap=inline",
+    "watch": "npm run dev -- --watch"
+  },
   "dependencies": {
     "mime-types": "^2.1.35",
     "recursive-readdir": "^2.2.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/magicmirror-module": "^2.16.6",
+    "@types/mime-types": "^3.0.1",
+    "@types/recursive-readdir": "^2.2.4",
     "eslint": "^9.19.0",
-    "eslint-config-prettier": "^10.0.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
-    "prettier": "^3.4.2"
-  },
-  "scripts": {
-    "lint": "eslint . --fix && prettier --write .",
-    "lint:check": "eslint . && prettier --check ."
+    "prettier": "^3.4.2",
+    "rollup": "^4.54.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0"
   }
 }

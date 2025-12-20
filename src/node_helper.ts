@@ -1,9 +1,11 @@
-const NodeHelper = require("node_helper");
-const recursive = require("recursive-readdir");
+import * as NodeHelper from "node_helper";
+import { ModulConfig } from "./types/Config";
 
-const mime = require("mime-types");
-const path = require("node:path");
-const fs = require("node:fs");
+import recursive from "recursive-readdir";
+
+import mime from "mime-types";
+import path from "node:path";
+import fs from "node:fs";
 
 const NOTIFICATION_TYPE = {
   GET_IMAGES: "RANDOM_IMAGES_GET",
@@ -17,20 +19,30 @@ module.exports = NodeHelper.create({
     console.log("Initializing Random-local-image module helper ...");
   },
 
-  socketNotificationReceived: function (notification, payload) {
+  socketNotificationReceived: function (
+    notification: string,
+    payload: ModulConfig,
+  ) {
     if (notification === NOTIFICATION_TYPE.GET_IMAGES) {
       var self = this;
       self.getImages(self, payload);
     }
   },
 
-  getImages: function (self, payload) {
+  getImages: function (self: any, payload: ModulConfig) {
     let photoDir = getMediaDir(payload, self);
+    if (!photoDir) {
+      // TOOD: log error
+      return;
+    }
 
     recursive(
       photoDir,
-      [(file, dirent) => dirent.isFile() && isImageOrVideo(dirent.name)],
-      function (err, data) {
+      [
+        (_: any, dirent: any) =>
+          dirent.isFile() && isImageOrVideo(dirent.name, payload),
+      ],
+      function (err: any, data: any) {
         if (err) {
           console.error("Error reading directory recursively:", err);
           return;
@@ -78,7 +90,7 @@ module.exports = NodeHelper.create({
   },
 });
 
-function getMediaDir(payload, self) {
+function getMediaDir(payload: ModulConfig, self: any) {
   let photoDir = getDirByPath(payload);
 
   if (!photoDir) {
@@ -95,7 +107,7 @@ function getMediaDir(payload, self) {
   return photoDir;
 }
 
-function getDirByPath(payload) {
+function getDirByPath(payload: ModulConfig) {
   const baseDir = payload.photoDir;
 
   if (!payload.selectFromSubdirectories) {
@@ -120,15 +132,15 @@ function getDirByPath(payload) {
   return selectRandomSubdirectoryPath(subDirectories, baseDir, payload);
 }
 
-function getSubDirectories(sourcePath, ignoreDirRegex) {
+function getSubDirectories(sourcePath: any, ignoreDirRegex: any): string[] {
   return fs
     .readdirSync(sourcePath, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name)
-    .filter((dirName) => !dirName.match(ignoreDirRegex));
+    .filter((dirent: any) => dirent.isDirectory())
+    .map((dirent: any) => dirent.name)
+    .filter((dirName: any) => !dirName.match(ignoreDirRegex));
 }
 
-function processFilePath(photoDir, fullPath) {
+function processFilePath(photoDir: string, fullPath: string) {
   const mimeType = mime.lookup(fullPath);
   if (!mimeType) {
     return null;
@@ -148,7 +160,10 @@ function processFilePath(photoDir, fullPath) {
   };
 }
 
-function hasMediaFilesInDirectory(dirPath, options) {
+function hasMediaFilesInDirectory(
+  dirPath: string,
+  options: ModulConfig,
+): boolean {
   try {
     const dir = fs.opendirSync(dirPath);
     let dirent;
@@ -161,8 +176,8 @@ function hasMediaFilesInDirectory(dirPath, options) {
 
     dir.closeSync();
     return false;
-  } catch (err) {
-    if (err.code !== "ENOENT") {
+  } catch (err: any) {
+    if (err?.code !== "ENOENT") {
       // if the error exists, but it still throws an error
       console.error("Error reading directory:", err);
     }
@@ -170,7 +185,7 @@ function hasMediaFilesInDirectory(dirPath, options) {
   }
 }
 
-function isImageOrVideo(fileName, options) {
+function isImageOrVideo(fileName: string, options: ModulConfig): boolean {
   const mimeType = mime.lookup(fileName);
   if (!mimeType) {
     return false;
@@ -185,7 +200,11 @@ function isImageOrVideo(fileName, options) {
  * Picks a random non-empty subdirectory.
  * Returns the path of the subdirectory, otherwise null.
  */
-function selectRandomSubdirectoryPath(subDirectories, baseDir, payload) {
+function selectRandomSubdirectoryPath(
+  subDirectories: string[],
+  baseDir: string,
+  payload: ModulConfig,
+): string | null {
   let subDirectoryPath = null;
   let tries = 5;
   do {
@@ -198,5 +217,5 @@ function selectRandomSubdirectoryPath(subDirectories, baseDir, payload) {
     tries--;
   } while (subDirectoryPath === null && tries > 0);
 
-  return null;
+  return null; // TOOD: throw error
 }
