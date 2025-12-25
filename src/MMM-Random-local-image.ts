@@ -9,7 +9,7 @@ import * as Log from "logger";
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
-    backupDir: undefined,
+    backupDir: "./modules/MMM-Random-local/image/backupFiles",
     errorDir: "./modules/MMM-Random-local-image/errorImages/",
     photoUpdateInterval: 30 * 1000, // 30 seconds
     photoLoadInitialDelay: 1000, // 1 second
