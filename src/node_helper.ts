@@ -1,16 +1,15 @@
 import * as NodeHelper from "node_helper";
-import { ModulConfig } from "./types/Config";
+import { ModulConfig } from "./types/config";
 
 import recursive from "recursive-readdir";
 
 import mime from "mime-types";
 import path from "node:path";
 import fs from "node:fs";
-
-const NOTIFICATION_TYPE = {
-  GET_IMAGES: "RANDOM_IMAGES_GET",
-  IMAGES_CHUNK: "RANDOM_IMAGES_CHUNK",
-};
+import { Image } from "./types/image";
+import { isImageOrVideo } from "./utilities/file";
+import { getDirByPath, hasMediaFilesInDirectory } from "./utilities/directory";
+import { SocketNotification } from "./types/socket-notification";
 
 const CHUNK_SIZE = 50;
 
@@ -23,13 +22,13 @@ module.exports = NodeHelper.create({
     notification: string,
     payload: ModulConfig,
   ) {
-    if (notification === NOTIFICATION_TYPE.GET_IMAGES) {
+    if (notification === SocketNotification.GetImages) {
       var self = this;
       self.getImages(self, payload);
     }
   },
 
-  getImages: function (self: any, payload: ModulConfig) {
+  getImages: function (self: any, payload: ModulConfig): void {
     let photoDir = getMediaDir(payload, self);
     if (!photoDir) {
       // TOOD: log error
@@ -64,7 +63,7 @@ module.exports = NodeHelper.create({
           currentChunk.push(file);
 
           if (currentChunk.length === CHUNK_SIZE) {
-            self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
+            self.sendImages({
               images: currentChunk,
               isFirstChunk,
               isLastChunk: false,
@@ -75,7 +74,7 @@ module.exports = NodeHelper.create({
         }
 
         if (currentChunk.length > 0 || isFirstChunk) {
-          self.sendSocketNotification(NOTIFICATION_TYPE.IMAGES_CHUNK, {
+          self.sendImages({
             images: currentChunk,
             isFirstChunk,
             isLastChunk: true,
@@ -88,9 +87,13 @@ module.exports = NodeHelper.create({
       },
     );
   },
+
+  sendImages: function (chunk: Image) {
+    this.sendSocketNotification(SocketNotification.MediaChunk, chunk);
+  },
 });
 
-function getMediaDir(payload: ModulConfig, self: any) {
+function getMediaDir(payload: ModulConfig, self: any): string | null {
   let photoDir = getDirByPath(payload);
 
   if (!photoDir) {
@@ -107,115 +110,16 @@ function getMediaDir(payload: ModulConfig, self: any) {
   return photoDir;
 }
 
-function getDirByPath(payload: ModulConfig) {
-  const baseDir = payload.photoDir;
-
-  if (!payload.selectFromSubdirectories) {
-    return hasMediaFilesInDirectory(baseDir, payload) ? baseDir : null;
-  }
-
-  let subDirectories = [];
-  try {
-    subDirectories = getSubDirectories(baseDir, payload.ignoreDirRegex);
-  } catch (err) {
-    console.log(`Error processing subdirectories for ${baseDir}`, err);
-    return null;
-  }
-
-  if (subDirectories.length === 0) {
-    console.error(
-      `no subdirectories found (ignoreDirRegex: ${payload.ignoreDirRegex}). falling back to base directory.`,
-    );
-    return null;
-  }
-
-  return selectRandomSubdirectoryPath(subDirectories, baseDir, payload);
-}
-
-function getSubDirectories(sourcePath: any, ignoreDirRegex: any): string[] {
-  return fs
-    .readdirSync(sourcePath, { withFileTypes: true })
-    .filter((dirent: any) => dirent.isDirectory())
-    .map((dirent: any) => dirent.name)
-    .filter((dirName: any) => !dirName.match(ignoreDirRegex));
-}
-
-function processFilePath(photoDir: string, fullPath: string) {
+function processFilePath(photoDir: string, fullPath: string): Image | null {
   const mimeType = mime.lookup(fullPath);
   if (!mimeType) {
     return null;
   }
 
-  const parentDirectory = path.basename(photoDir);
-
-  // Get file stats to extract creation date
-  const stats = fs.statSync(fullPath);
-  const creationDate = stats.birthtime;
-
   return {
     fullPath,
-    relativePath: `${parentDirectory}/${fullPath.slice(photoDir.length - 2)}`,
     mimeType,
-    creationDate,
+    relativePath: `${path.basename(photoDir)}/${fullPath.slice(photoDir.length - 2)}`,
+    creationDate: fs.statSync(fullPath).birthtime.toDateString(), // TODO: can i parse this one?
   };
-}
-
-function hasMediaFilesInDirectory(
-  dirPath: string,
-  options: ModulConfig,
-): boolean {
-  try {
-    const dir = fs.opendirSync(dirPath);
-    let dirent;
-    while ((dirent = dir.readSync()) !== null) {
-      if (dirent.isFile() && isImageOrVideo(dirent.name, options)) {
-        dir.closeSync();
-        return true; // Found one, exit immediately
-      }
-    }
-
-    dir.closeSync();
-    return false;
-  } catch (err: any) {
-    if (err?.code !== "ENOENT") {
-      // if the error exists, but it still throws an error
-      console.error("Error reading directory:", err);
-    }
-    return false;
-  }
-}
-
-function isImageOrVideo(fileName: string, options: ModulConfig): boolean {
-  const mimeType = mime.lookup(fileName);
-  if (!mimeType) {
-    return false;
-  }
-  const fileType = mimeType.split("/")[0];
-  return (
-    fileType === "image" || (!options.ignoreVideos && fileType === "video")
-  );
-}
-
-/**
- * Picks a random non-empty subdirectory.
- * Returns the path of the subdirectory, otherwise null.
- */
-function selectRandomSubdirectoryPath(
-  subDirectories: string[],
-  baseDir: string,
-  payload: ModulConfig,
-): string | null {
-  let subDirectoryPath = null;
-  let tries = 5;
-  do {
-    const randomSubDirectory =
-      subDirectories[Math.floor(Math.random() * subDirectories.length)];
-    subDirectoryPath = path.join(baseDir, randomSubDirectory);
-    if (hasMediaFilesInDirectory(subDirectoryPath, payload)) {
-      return subDirectoryPath;
-    }
-    tries--;
-  } while (subDirectoryPath === null && tries > 0);
-
-  return null; // TOOD: throw error
 }

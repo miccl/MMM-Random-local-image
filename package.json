@@ -10,8 +10,11 @@
     "lint:check": "eslint . && prettier --check .",
     "postinstall": "npm run build",
     "build": "rollup -c",
-    "dev": "rollup -c --sourcemap=inline",
-    "watch": "npm run dev -- --watch"
+    "build:dev": "rollup -c --sourcemap=inline",
+    "build:watch": "npm run dev -- --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "mime-types": "^2.1.35",
@@ -30,9 +33,11 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
+    "memfs": "^4.51.1",
     "prettier": "^3.4.2",
     "rollup": "^4.54.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.50.0",
+    "vitest": "^4.0.16"
   }
 }

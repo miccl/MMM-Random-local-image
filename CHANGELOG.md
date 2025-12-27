@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Add option for a backup dir to display media when `photoDir` has no files or is unreadable.
 - Will show error images directly on the mirror when the app runs into an error.
+- Added tests
 
 ### Changed
 
@@ -17,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `showAdditionalInformations` to false (in regards to issue #10)
   - `ignoreVideos` to true (prevents unintented huge videos to be loaded)
 - Improve filtering of files which should improve performance
+- Rewrote code to typescript using Rollup (following the [guide from Matt Gerega](https://www.mattgerega.com/2023/08/23/taking-my-magicmirror-modules-to-typescript/))
+
 
 ### Fixed
 
