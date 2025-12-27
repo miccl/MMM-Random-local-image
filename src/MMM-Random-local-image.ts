@@ -5,6 +5,11 @@
  */
 
 import * as Log from "logger";
+import { shuffle } from "./utilities/shuffle";
+import { Image } from "./types/image";
+import { processInfoTemplate } from "./utilities/info-template";
+import { ImageInfoConfig } from "./types/config";
+import { SocketNotification } from "./types/socket-notification";
 
 Module.register("MMM-Random-local-image", {
   defaults: {
@@ -41,15 +46,27 @@ Module.register("MMM-Random-local-image", {
       this.error = "Missing required parameter 'photoDir'";
     }
 
-    setTimeout(() => this.loadImages(), this.config.photoLoadInitialDelay);
+    setTimeout(() => {
+      Log.info("Retrieving first images...");
+      this.sendSocketNotification(SocketNotification.GetImages, this.config);
+    }, this.config.photoLoadInitialDelay);
+
+    setInterval(() => this.loadNextImage(), this.config.photoUpdateInterval);
+
+    // only need to refresh when there are subdirectories
+    if (this.config.selectFromSubdirectories) {
+      setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
+    }
   },
 
   /**
    * Triggers node_helper.js to load the images from the disk
    */
   loadImages: function () {
-    Log.info("Retrieving images...");
-    this.sendSocketNotification("RANDOM_IMAGES_GET", this.config);
+    if (this.initialImageLoadingFinished) {
+      Log.info("Retrieving images...");
+      this.sendSocketNotification(SocketNotification.GetImages, this.config);
+    }
   },
 
   /**
@@ -58,50 +75,38 @@ Module.register("MMM-Random-local-image", {
    * @param payload images
    */
   socketNotificationReceived: function (notification, payload) {
-    if (notification === "RANDOM_IMAGES_CHUNK") {
-      this.images = payload.isFirstChunk
-        ? payload.images
-        : this.images.concat(payload.images);
+    if (notification !== SocketNotification.MediaChunk) {
+      return;
+    }
 
-      if (payload.isFirstChunk) {
-        this.totalImages = payload.images.length;
-        this.imageIndex = -1;
-        if (this.config.randomOrder) {
-          this.images = shuffle(this.images);
-        }
+    this.images = payload.isFirstChunk
+      ? payload.images
+      : this.images.concat(payload.images);
 
-        const isFirstTime = !this.initialImageLoadingFinished;
-        this.initialImageLoadingFinished = true;
-        this.loadNextImage();
-
-        if (isFirstTime) {
-          setInterval(
-            () => this.loadNextImage(),
-            this.config.photoUpdateInterval,
-          );
-
-          // only need to refresh when there are subdirecto
-          if (this.config.selectFromSubdirectories) {
-            setInterval(
-              () => this.loadImages(),
-              this.config.photoLoadUpdateInterval,
-            );
-          }
-        }
-        return;
-      }
-
-      // Add to totalImages for subsequent chunks
-      this.totalImages += payload.images.length;
-
-      // If this is the last chunk, shuffle the images if random order is enable
-      if (payload.isLastChunk && this.config.randomOrder) {
+    if (payload.isFirstChunk) {
+      this.totalImages = payload.images.length;
+      this.imageIndex = -1;
+      if (this.config.randomOrder) {
         this.images = shuffle(this.images);
       }
+
+      this.initialImageLoadingFinished = true;
+    }
+
+    // Add to totalImages for subsequent chunks
+    this.totalImages += payload.images.length;
+
+    // If this is the last chunk, shuffle the images if random order is enable
+    if (payload.isLastChunk && this.config.randomOrder) {
+      this.images = shuffle(this.images);
     }
   },
 
   loadNextImage: function () {
+    if (!this.initialImageLoadingFinished) {
+      return;
+    }
+
     const allImagesShown = this.setNextImage();
     if (allImagesShown) {
       this.loadImages(); // Automatically reload images when all have been shown
@@ -115,11 +120,13 @@ Module.register("MMM-Random-local-image", {
     if (this.images.length > 0 && this.imageIndex >= 0) {
       this.images.splice(this.imageIndex, 1);
     }
+
     // If no images left, reset
     if (this.images.length === 0) {
       this.imageIndex = 0;
       return true;
     }
+
     // Always show the next image at index 0
     this.imageIndex = 0;
     return false;
@@ -153,12 +160,12 @@ Module.register("MMM-Random-local-image", {
     return wrapper;
   },
 
-  createImageElement: function (image: any) {
+  createImageElement: function (image: Image) {
     const mediaType = image.mimeType.split("/")[0];
     let element = document.createElement("img") as any;
     if (mediaType === "video") {
       element = document.createElement("video");
-      element.type = image.mime;
+      element.type = image.mimeType;
     }
 
     element.src = image.fullPath;
@@ -168,76 +175,21 @@ Module.register("MMM-Random-local-image", {
     return element;
   },
 
-  createInfoElement: function (image: any) {
+  createInfoElement: function (image: Image) {
     const element = document.createElement("div");
     element.className = "dimmed small regular"; // use styles from magic mirrors main.css
 
-    const infoText = this.processInfoTemplate(image);
+    const infoText = processInfoTemplate(
+      image,
+      {
+        currentImagesCount: this.images.length,
+        totalImagesCount: this.totalImages,
+      },
+      this.config as ImageInfoConfig,
+    );
 
     const node = document.createTextNode(infoText);
     element.appendChild(node);
     return element;
   },
-
-  processInfoTemplate: function (image: any) {
-    const dateObj = new Date(image.creationDate);
-    const values = {
-      date: this.formatDate(dateObj, this.config.dateFormat),
-      currentCount: this.totalImages - this.images.length + 1,
-      totalCount: this.totalImages,
-    };
-
-    let result = this.config.infoTemplate;
-
-    // Replace each placeholder with its corresponding value
-    Object.keys(values).forEach((key) => {
-      const placeholder = new RegExp(`{{${key}}}`, "g");
-      // @ts-ignore
-      result = result.replace(placeholder, values[key]);
-    });
-
-    return result;
-  },
-
-  formatDate: function (date: any, format: any) {
-    // Simple date formatter
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    switch (format) {
-      case "MM/DD/YYYY":
-        return `${month}/${day}/${year}`;
-      case "DD.MM.YYYY":
-        return `${day}.${month}.${year}`;
-      case "YYYY-MM-DD":
-      default:
-        return `${year}-${month}-${day}`;
-    }
-  },
 });
-
-/**
- * Randomly shuffle an array
- * https://stackoverflow.com/a/2450976/1293256
- * @param  {Array} array The array to shuffle
- * @return {String}      The first item in the shuffled array
- */
-function shuffle(array: any) {
-  let currentIndex = array.length;
-  let temporaryValue, randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
