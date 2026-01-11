@@ -1,15 +1,14 @@
-import { ModulConfig } from "../types/config";
-
-import fs from "fs";
-import { isImageOrVideo } from "./file";
+import fs, { type Dirent } from "node:fs";
 import path from "node:path";
+import type { ModulConfig } from "../types/config";
+import { isImageOrVideo } from "./file";
 
 export function getDirByPath(
   config: Pick<
     ModulConfig,
     "photoDir" | "selectFromSubdirectories" | "ignoreDirRegex" | "ignoreVideos"
   >,
-) {
+): string | null {
   const baseDir = config.photoDir;
 
   if (!config.selectFromSubdirectories) {
@@ -35,14 +34,14 @@ export function getDirByPath(
 }
 
 export function getSubDirectories(
-  sourcePath: any,
-  ignoreDirRegex: any,
+  sourcePath: string,
+  ignoreDirRegex: string,
 ): string[] {
   return fs
     .readdirSync(sourcePath, { withFileTypes: true })
-    .filter((dirent: any) => dirent.isDirectory())
-    .map((dirent: any) => dirent.name)
-    .filter((dirName: any) => !dirName.match(ignoreDirRegex));
+    .filter((dirent: Dirent) => dirent.isDirectory())
+    .map((dirent: Dirent) => dirent.name)
+    .filter((dirName: string) => !dirName.match(ignoreDirRegex));
 }
 
 export function hasMediaFilesInDirectory(
@@ -51,20 +50,22 @@ export function hasMediaFilesInDirectory(
 ): boolean {
   try {
     const dir = fs.opendirSync(dirPath);
-    let dirent;
-    while ((dirent = dir.readSync()) !== null) {
+    let dirent: Dirent | null = dir.readSync();
+    while (dirent !== null) {
       if (dirent.isFile() && isImageOrVideo(dirent.name, options)) {
         dir.closeSync();
         return true; // Found one, exit immediately
       }
+      dirent = dir.readSync();
     }
 
     dir.closeSync();
     return false;
-  } catch (err: any) {
-    if (err?.code !== "ENOENT") {
+  } catch (err: unknown) {
+    const error = err as NodeJS.ErrnoException;
+    if (error?.code !== "ENOENT") {
       // if the error exists, but it still throws an error
-      console.error("Error reading directory:", err);
+      console.error("Error reading directory:", error);
     }
     return false;
   }

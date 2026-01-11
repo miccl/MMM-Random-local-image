@@ -1,5 +1,5 @@
-import { Image } from "../types/image";
-import { ImageInfoConfig, PlaceholderKey } from "../types/config";
+import type { ImageInfoConfig, PlaceholderKey } from "../types/config";
+import type { Image } from "../types/image";
 
 export function processInfoTemplate(
   image: Pick<Image, "creationDate">,
@@ -36,7 +36,6 @@ export function formatDate(creationDate: Date, format: string) {
       return `${month}/${day}/${year}`;
     case "DD.MM.YYYY":
       return `${day}.${month}.${year}`;
-    case "YYYY-MM-DD":
     // TOOD: throw error?
     default:
       return `${year}-${month}-${day}`;

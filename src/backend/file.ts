@@ -1,5 +1,5 @@
 import mime from "mime-types";
-import { ModulConfig } from "../types/config";
+import type { ModulConfig } from "../types/config";
 
 export function isImageOrVideo(
   fileName: string,

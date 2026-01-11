@@ -5,11 +5,11 @@
  */
 
 import * as Log from "logger";
-import { shuffle } from "./utilities/shuffle";
-import { Image, ImageChunk } from "./types/image";
 import { processInfoTemplate } from "./frontend/info-template";
-import { ImageInfoConfig } from "./types/config";
+import type { ImageInfoConfig } from "./types/config";
+import type { Image, ImageChunk } from "./types/image";
 import { SocketNotification } from "./types/socket-notification";
+import { shuffle } from "./utilities/shuffle";
 
 Module.register("MMM-Random-local-image", {
   defaults: {
@@ -39,7 +39,7 @@ Module.register("MMM-Random-local-image", {
 
   start: function () {
     Log.info(`Module ${this.name} started...`);
-    Log.debug("Configuration: : " + this.config);
+    Log.debug(`Configuration: : ${this.config}`);
 
     // TODO: check it for all configs and check type
     if (!this.config.photoDir) {
@@ -162,16 +162,16 @@ Module.register("MMM-Random-local-image", {
 
   createImageElement: function (image: Image) {
     const mediaType = image.mimeType.split("/")[0];
-    let element = document.createElement("img") as any;
+    let element: HTMLImageElement | HTMLVideoElement =
+      document.createElement("img");
     if (mediaType === "video") {
       element = document.createElement("video");
-      element.type = image.mimeType;
     }
 
     element.src = image.fullPath;
-    element.style.maxWidth = this.config.maxWidth;
-    element.style.maxHeight = this.config.maxHeight;
-    element.style.opacity = this.config.opacity;
+    element.style.maxWidth = String(this.config.maxWidth);
+    element.style.maxHeight = String(this.config.maxHeight);
+    element.style.opacity = String(this.config.opacity);
     return element;
   },
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { ImageInfoConfig } from "../types/config";
 import { formatDate, processInfoTemplate } from "./info-template";
-import { ImageInfoConfig } from "../types/config";
 
 describe("processInfoTemplate", () => {
   it("replaces date, currentCount and totalCount placeholders", () => {
@@ -25,23 +25,20 @@ describe("processInfoTemplate", () => {
     [3, "#3 of 5"],
     [2, "#4 of 5"],
     [1, "#5 of 5"],
-  ])(
-    "computes currentCount correctly for currentImagesCount=%s",
-    (currentImagesCount, expected) => {
-      const infoTemplate: ImageInfoConfig = {
-        infoTemplate: "#{{currentCount}} of {{totalCount}}",
-        dateFormat: "YYYY-MM-DD",
-      };
+  ])("computes currentCount correctly for currentImagesCount=%s", (currentImagesCount, expected) => {
+    const infoTemplate: ImageInfoConfig = {
+      infoTemplate: "#{{currentCount}} of {{totalCount}}",
+      dateFormat: "YYYY-MM-DD",
+    };
 
-      expect(
-        processInfoTemplate(
-          { creationDate: "2023-06-15" },
-          { totalImagesCount: 5, currentImagesCount },
-          infoTemplate,
-        ),
-      ).toBe(expected);
-    },
-  );
+    expect(
+      processInfoTemplate(
+        { creationDate: "2023-06-15" },
+        { totalImagesCount: 5, currentImagesCount },
+        infoTemplate,
+      ),
+    ).toBe(expected);
+  });
 
   it("replaces repeated placeholders globally", () => {
     const infoTemplate: ImageInfoConfig = {
