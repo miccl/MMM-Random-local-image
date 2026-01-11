@@ -6,8 +6,8 @@
 
 import * as Log from "logger";
 import { shuffle } from "./utilities/shuffle";
-import { Image } from "./types/image";
-import { processInfoTemplate } from "./utilities/info-template";
+import { Image, ImageChunk } from "./types/image";
+import { processInfoTemplate } from "./frontend/info-template";
 import { ImageInfoConfig } from "./types/config";
 import { SocketNotification } from "./types/socket-notification";
 
@@ -74,7 +74,7 @@ Module.register("MMM-Random-local-image", {
    * @param notification type of the notification
    * @param payload images
    */
-  socketNotificationReceived: function (notification, payload) {
+  socketNotificationReceived: function (notification, payload: ImageChunk) {
     if (notification !== SocketNotification.MediaChunk) {
       return;
     }
