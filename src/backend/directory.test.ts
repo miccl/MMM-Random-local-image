@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import fs from "fs";
+import fs from "node:fs";
 import { vol } from "memfs";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ModulConfig } from "../types/config";
 import {
   getDirByPath,
   getSubDirectories,
   hasMediaFilesInDirectory,
 } from "./directory";
-import { ModulConfig } from "../types/config";
 
 const baseConfig = {
   photoDir: "/base",
@@ -112,7 +112,7 @@ describe("directory utilities (memfs)", () => {
         "/base/file.txt",
       );
 
-      const dirs = getSubDirectories("/base", /ignore/);
+      const dirs = getSubDirectories("/base", "ignore");
       expect(dirs).toEqual(["dirA"]);
     });
   });
@@ -140,11 +140,11 @@ describe("directory utilities (memfs)", () => {
     });
 
     it("returns false and logs error for unexpected errors", () => {
-      const spy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-      const mock = vi.spyOn(fs, "opendirSync").mockImplementation(() => {
-        const err: any = new Error("EACCESS example message");
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const _mock = vi.spyOn(fs, "opendirSync").mockImplementation(() => {
+        const err = new Error(
+          "EACCESS example message",
+        ) as NodeJS.ErrnoException;
         err.code = "EACCES";
         throw err;
       });

@@ -9,4 +9,4 @@ export type Image = {
   relativePath: string;
   mimeType: string;
   creationDate: string;
-}
+};

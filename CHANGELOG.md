@@ -4,13 +4,14 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.4.0] - Unreleased
 
 ### Added
 
 - Add option for a backup dir to display media when `photoDir` has no files or is unreadable.
 - Will show error images directly on the mirror when the app runs into an error.
 - Added tests
+- Replaced ESLint + Prettier with Biome
 
 ### Changed
 
@@ -19,7 +20,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `ignoreVideos` to true (prevents unintented huge videos to be loaded)
 - Improve filtering of files which should improve performance
 - Rewrote code to typescript using Rollup (following the [guide from Matt Gerega](https://www.mattgerega.com/2023/08/23/taking-my-magicmirror-modules-to-typescript/))
-
 
 ### Fixed
 

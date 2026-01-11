@@ -1,20 +1,24 @@
-import * as NodeHelper from "node_helper";
-import { ModulConfig } from "./types/config";
-
-import recursive from "recursive-readdir";
-
-import mime from "mime-types";
-import path from "node:path";
 import fs from "node:fs";
-import { Image, ImageChunk } from "./types/image";
-import { isImageOrVideo } from "./backend/file";
+import path from "node:path";
+import mime from "mime-types";
+import * as NodeHelper from "node_helper";
+import recursive from "recursive-readdir";
 import { getDirByPath, hasMediaFilesInDirectory } from "./backend/directory";
+import { isImageOrVideo } from "./backend/file";
+import type { ModulConfig } from "./types/config";
+import type { Image, ImageChunk } from "./types/image";
 import { SocketNotification } from "./types/socket-notification";
 
 const CHUNK_SIZE = 50;
 
+// TODO: get rid of this
+type NodeHelperContext = {
+  sendImages: (chunk: ImageChunk) => void;
+  getImages: (self: NodeHelperContext, payload: ModulConfig) => void;
+};
+
 module.exports = NodeHelper.create({
-  init: function () {
+  init: () => {
     console.log("Initializing Random-local-image module helper ...");
   },
 
@@ -23,13 +27,12 @@ module.exports = NodeHelper.create({
     payload: ModulConfig,
   ) {
     if (notification === SocketNotification.GetImages) {
-      var self = this;
-      self.getImages(self, payload);
+      this.getImages(this, payload);
     }
   },
 
-  getImages: function (self: any, payload: ModulConfig): void {
-    let photoDir = getMediaDir(payload, self);
+  getImages: (self: NodeHelperContext, payload: ModulConfig): void => {
+    const photoDir = getMediaDir(payload, self);
     if (!photoDir) {
       // TOOD: log error
       return;
@@ -37,11 +40,8 @@ module.exports = NodeHelper.create({
 
     recursive(
       photoDir,
-      [
-        (_: any, dirent: any) =>
-          dirent.isFile() && isImageOrVideo(dirent.name, payload),
-      ],
-      function (err: any, data: any) {
+      [ignoreFiles(payload)],
+      (err: Error | null, data: string[] | undefined) => {
         if (err) {
           console.error("Error reading directory recursively:", err);
           return;
@@ -93,7 +93,15 @@ module.exports = NodeHelper.create({
   },
 });
 
-function getMediaDir(payload: ModulConfig, self: any): string | null {
+function ignoreFiles(config: ModulConfig) {
+  return (filePath: string, stats: fs.Stats) =>
+    stats.isFile() && !isImageOrVideo(path.basename(filePath), config);
+}
+
+function getMediaDir(
+  payload: ModulConfig,
+  self: NodeHelperContext,
+): string | null {
   let photoDir = getDirByPath(payload);
 
   if (!photoDir) {
