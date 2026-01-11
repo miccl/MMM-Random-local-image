@@ -6,9 +6,9 @@ import recursive from "recursive-readdir";
 import mime from "mime-types";
 import path from "node:path";
 import fs from "node:fs";
-import { Image } from "./types/image";
-import { isImageOrVideo } from "./utilities/file";
-import { getDirByPath, hasMediaFilesInDirectory } from "./utilities/directory";
+import { Image, ImageChunk } from "./types/image";
+import { isImageOrVideo } from "./backend/file";
+import { getDirByPath, hasMediaFilesInDirectory } from "./backend/directory";
 import { SocketNotification } from "./types/socket-notification";
 
 const CHUNK_SIZE = 50;
@@ -88,7 +88,7 @@ module.exports = NodeHelper.create({
     );
   },
 
-  sendImages: function (chunk: Image) {
+  sendImages: function (chunk: ImageChunk) {
     this.sendSocketNotification(SocketNotification.MediaChunk, chunk);
   },
 });
