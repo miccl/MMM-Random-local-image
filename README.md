@@ -62,11 +62,11 @@ The following properties can be configured:
 
 ### Backup
 
-The media files are loaded from `photoDir`. If there are no files in `photoDir` the files in `backupDir` are used (e.g. when the nfs connection could not be established). The programm will retry to load the files in `photoDir` every Minute.
+The media files are loaded from `photoDir`. If there are no files in `photoDir` the files in `backupDir` are used (e.g. when the nfs connection could not be established). If both directories are empty or not found, an error message will be displayed. The program will retry to load the files in `photoDir` every minute.
 
-| Option      | Description                                                   | Possible Values | Default Value                                 |
-|-------------|---------------------------------------------------------------|-----------------|-----------------------------------------------|
-| `backupDir` | Media folder acting as backup (relative to MM root directory) | Local file path | ./modules/MMM-Random-local-image/backupFiles/ |
+| Option      | Description                                                   | Possible Values | Default Value                                |
+|-------------|---------------------------------------------------------------|-----------------|----------------------------------------------|
+| `backupDir` | Media folder acting as backup (relative to MM root directory) | Local file path | ./modules/MMM-Random-local-image/backupFiles |
 
 ### Media from Subdirectories
 

@@ -14,8 +14,7 @@ import { shuffle } from "./utilities/shuffle";
 Module.register("MMM-Random-local-image", {
   defaults: {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
-    backupDir: "./modules/MMM-Random-local/image/backupFiles",
-    errorDir: "./modules/MMM-Random-local-image/errorImages/",
+    backupDir: undefined,
     photoUpdateInterval: 30 * 1000, // 30 seconds
     photoLoadInitialDelay: 1000, // 1 second
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000, // 12 hours

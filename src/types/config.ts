@@ -1,7 +1,6 @@
 export type ModulConfig = {
   photoDir: string;
   backupDir?: string;
-  errorDir: string; // TODO: remove
   photoUpdateInterval: number;
   photoLoadInitialDelay: number;
   photoLoadUpdateInterval: number;

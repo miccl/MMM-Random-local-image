@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "mime-types": "^2.1.35",
-    "recursive-readdir": "^2.2.3"
+    "recursive-readdir": "^2.2.3",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
@@ -29,6 +30,7 @@
     "@types/magicmirror-module": "^2.16.6",
     "@types/mime-types": "^3.0.1",
     "@types/recursive-readdir": "^2.2.4",
+    "@types/sharp": "^0.31.1",
     "memfs": "^4.51.1",
     "rollup": "^4.54.0",
     "typescript": "^5.9.3",
