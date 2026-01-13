@@ -31,7 +31,7 @@ describe("FileProcessingError", () => {
 
   it("should provide appropriate display message", () => {
     const error = new FileProcessingError("/path/to/file.jpg", "Some reason");
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
 
     expect(displayMessage).toBe("Failed to process file");
   });

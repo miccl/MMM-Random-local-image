@@ -55,14 +55,14 @@ describe("NoMediaFilesError", () => {
 
   it("should provide appropriate display message when ignoreVideos is true", () => {
     const error = new NoMediaFilesError("/path", true);
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
 
     expect(displayMessage).toBe("No image files found in directory");
   });
 
   it("should provide appropriate display message when ignoreVideos is false", () => {
     const error = new NoMediaFilesError("/path", false);
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
 
     expect(displayMessage).toBe("No media files found in directory");
   });

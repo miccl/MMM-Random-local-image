@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DirectoryReadError } from "./directory-read-error";
 import type { NodeJsError } from "../../frontend/node-js-error";
+import { DirectoryReadError } from "./directory-read-error";
 
 describe("DirectoryReadError", () => {
   it("should create error with directory and original error", () => {
@@ -64,7 +64,7 @@ describe("DirectoryReadError", () => {
     (originalError as NodeJsError).code = "ENOENT";
     const error = new DirectoryReadError("/path", originalError);
 
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
     expect(displayMessage).toBe("Directory does not exist");
   });
 
@@ -73,7 +73,7 @@ describe("DirectoryReadError", () => {
     (originalError as NodeJsError).code = "EACCES";
     const error = new DirectoryReadError("/path", originalError);
 
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
     expect(displayMessage).toBe("Permission denied");
   });
 
@@ -81,7 +81,7 @@ describe("DirectoryReadError", () => {
     const originalError = new Error("Unknown");
     const error = new DirectoryReadError("/path", originalError);
 
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
     expect(displayMessage).toBe("Failed to read directory");
   });
 
