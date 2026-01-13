@@ -1,5 +1,5 @@
 import { BackendError } from "../backend-error";
-import { truncatePath } from "../utils/path";
+import { truncatePath } from "../path";
 
 /**
  * Error thrown when the backup directory cannot be found or has no media files.

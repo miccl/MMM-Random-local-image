@@ -1,6 +1,6 @@
 import { BackendError } from "../backend-error";
-import { truncatePath } from "../utils/path";
-import type { NodeJsError } from "./node-js-error";
+import { truncatePath } from "../path";
+import type { NodeJsError } from "../../frontend/node-js-error";
 
 /**
  * Error thrown when directory reading fails (e.g., permissions, doesn't exist).

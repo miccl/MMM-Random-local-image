@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DirectoryReadError } from "./directory-read-error";
-import type { NodeJsError } from "./node-js-error";
+import type { NodeJsError } from "../../frontend/node-js-error";
 
 describe("DirectoryReadError", () => {
   it("should create error with directory and original error", () => {
