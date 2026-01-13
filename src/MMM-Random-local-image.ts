@@ -6,10 +6,10 @@
 
 import * as Log from "logger";
 import { processInfoTemplate } from "./frontend/info-template";
+import { shuffle } from "./frontend/shuffle";
 import type { ImageInfoConfig } from "./types/config";
 import type { Image, ImageChunk } from "./types/image";
 import { SocketNotification } from "./types/socket-notification";
-import { shuffle } from "./frontend/shuffle";
 
 Module.register("MMM-Random-local-image", {
   defaults: {
