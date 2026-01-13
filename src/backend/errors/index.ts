@@ -12,4 +12,4 @@ export { BackupDirNotFoundError } from "./backup-dir-not-found-error";
 export { DirectoryReadError } from "./directory-read-error";
 export { FileProcessingError } from "./file-processing-error";
 export { NoMediaFilesError } from "./no-media-files-error";
-export type { NodeJsError } from "./node-js-error";
+export type { NodeJsError } from "../../frontend/node-js-error";

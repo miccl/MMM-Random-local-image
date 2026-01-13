@@ -9,7 +9,7 @@ import { processInfoTemplate } from "./frontend/info-template";
 import type { ImageInfoConfig } from "./types/config";
 import type { Image, ImageChunk } from "./types/image";
 import { SocketNotification } from "./types/socket-notification";
-import { shuffle } from "./utilities/shuffle";
+import { shuffle } from "./frontend/shuffle";
 
 Module.register("MMM-Random-local-image", {
   defaults: {

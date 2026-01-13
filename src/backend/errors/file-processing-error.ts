@@ -1,5 +1,5 @@
 import { BackendError } from "../backend-error";
-import { truncatePath } from "../utils/path";
+import { truncatePath } from "../path";
 
 /**
  * Error thrown when a specific file cannot be processed.
