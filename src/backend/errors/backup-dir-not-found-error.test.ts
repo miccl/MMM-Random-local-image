@@ -54,7 +54,7 @@ describe("BackupDirNotFoundError", () => {
 
   it("should provide proper display message", () => {
     const error = new BackupDirNotFoundError("/photos", "/backup");
-    const displayMessage = error["getDisplayMessage"]();
+    const displayMessage = error.getDisplayMessage();
 
     expect(displayMessage).toBe(
       "No media files found in configured directories",

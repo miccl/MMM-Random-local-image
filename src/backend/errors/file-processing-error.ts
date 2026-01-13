@@ -16,7 +16,7 @@ export class FileProcessingError extends BackendError {
     this.filePath = filePath;
   }
 
-  protected getDisplayMessage(): string {
+  getDisplayMessage(): string {
     return "Failed to process file";
   }
 

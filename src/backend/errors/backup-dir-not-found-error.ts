@@ -20,7 +20,7 @@ export class BackupDirNotFoundError extends BackendError {
     this.backupDir = backupDir;
   }
 
-  protected getDisplayMessage(): string {
+  getDisplayMessage(): string {
     return "No media files found in configured directories";
   }
 

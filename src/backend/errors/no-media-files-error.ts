@@ -18,7 +18,7 @@ export class NoMediaFilesError extends BackendError {
     this.ignoreVideos = ignoreVideos;
   }
 
-  protected getDisplayMessage(): string {
+  getDisplayMessage(): string {
     return this.ignoreVideos
       ? "No image files found in directory"
       : "No media files found in directory";

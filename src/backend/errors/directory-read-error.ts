@@ -1,6 +1,6 @@
+import type { NodeJsError } from "../../frontend/node-js-error";
 import { BackendError } from "../backend-error";
 import { truncatePath } from "../path";
-import type { NodeJsError } from "../../frontend/node-js-error";
 
 /**
  * Error thrown when directory reading fails (e.g., permissions, doesn't exist).
@@ -20,7 +20,7 @@ export class DirectoryReadError extends BackendError {
     this.originalError = originalError;
   }
 
-  protected getDisplayMessage(): string {
+  getDisplayMessage(): string {
     const code = (this.originalError as NodeJsError).code;
     if (code === "ENOENT") return "Directory does not exist";
     if (code === "EACCES") return "Permission denied";
