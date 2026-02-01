@@ -13,6 +13,7 @@ cd ~/MagicMirror/modules
 git clone https://github.com/miccl/MMM-Random-local-image.git
 cd MMM-Random-local-image
 npm ci
+npm run build
 ```
 
 Finally, configure the module in the config.js file (instructions below).
@@ -25,6 +26,7 @@ To update the module to the latest version, pull the latest changes and reinstal
 cd ~/MagicMirror/modules/MMM-Random-local-image
 git pull
 npm ci
+npm run build
 ```
 
 Check the [Changelog](CHANGELOG.md) for all updates.

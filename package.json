@@ -9,7 +9,6 @@
     "lint": "biome check . --write",
     "lint:check": "biome check .",
     "format": "biome check . --write",
-    "postinstall": "npm run build",
     "build": "rollup -c",
     "build:dev": "rollup -c --sourcemap=inline",
     "build:watch": "npm run dev -- --watch",
