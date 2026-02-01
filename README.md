@@ -4,6 +4,15 @@ A [MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror) module that displ
 
 ![Screenshot](.github/demo.gif)
 
+## Features
+
+* **Image & Video Support** - Display both photos and videos seamlessly
+* **Handles Large Collections** - Optimized chunking for hundreds of media files without freezing
+* **Visual error images** - Displays error messages as images on the mirror (no need to check logs)
+* **Subdirectory selection** - Can randomly pick from subdirectories to avoid scanning entire collections
+* **Backup Directory Fallback** - Auto-switches to backup if primary directory unavailable (perfect for NFS)
+* **Customizable Info Display** - Flexible templates showing date, position, custom text
+
 ## Installing the module
 
 To install the module, clone the repo and install dependencies:
