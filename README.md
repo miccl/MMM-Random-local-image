@@ -12,6 +12,7 @@ A [MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror) module that displ
 * **Subdirectory selection** - Can randomly pick from subdirectories to avoid scanning entire collections
 * **Backup Directory Fallback** - Auto-switches to backup if primary directory unavailable (perfect for NFS)
 * **Customizable Info Display** - Flexible templates showing date, position, custom text
+* **Transition Effects** - Smooth animations between images with 6 different effects (fade, slide, zoom)
 
 ## Installing the module
 
@@ -69,7 +70,7 @@ The following properties can be configured:
 | `randomOrder`           | Whether to display medias in random order                     | `true` or `false`    | `true`                                          |
 | `ignoreVideos`          | Wether to ignore videos                                       | `true` or `false`    | `true`                                          |
 | `photoUpdateInterval`   | Time interval between displayed media                         | Positive number (ms) | 30.000 (every 30 seconds)                       |
-| `photoLoadInitialDelay` | Initial delay before loading the first media                  | Positive number (ms) | 1000 (1 second)                                 |
+| `photoLoadInitialDelay` | Initial delay before loading the first media                  | Positive number (ms) | 0 (0 seconds)                                   |
 
 ### Backup
 
@@ -120,11 +121,45 @@ If you have ideas for more useful templates, just create an issue with a suggest
 
 Style the media container using CSS.
 
-| Option      | Description                       | Possible Values              | Default Value |
-|-------------|-----------------------------------|------------------------------|---------------|
-| `opacity`   | Opacity of the displayed media    | 0.0 to 1.0                   | 1.0           |
-| `maxWidth`  | Maximum width of media container  | css values (e.g. 100%, 30px) | 100%          |
-| `maxHeight` | Maximum height of media container | css values (e.g. 100%, 30px) | 100%          |
+| Option               | Description                       | Possible Values                                                                 | Default Value                                                  |
+|----------------------|-----------------------------------|---------------------------------------------------------------------------------|----------------------------------------------------------------|
+| `opacity`            | Opacity of the displayed media    | 0.0 to 1.0                                                                      | 1.0                                                            |
+| `maxWidth`           | Maximum width of media container  | css values (e.g. 100%, 30px)                                                    | 100%                                                           |
+| `maxHeight`          | Maximum height of media container | css values (e.g. 100%, 30px)                                                    | 100%                                                           |
+| `transition`         | Array of transition effects       | Array of: `fade`, `slide-left`, `slide-right`, `slide-up`, `slide-down`, `zoom` | `["fade"]` |
+| `transitionDuration` | Duration of transition effect     | Positive number (ms)                                                            | 1000                                                           |
+
+#### Transition Effects
+
+The `transition` option accepts an array of transition effects. For each image change, a random transition will be selected from the array.
+
+**No Transition**: Use no transition
+```javascript
+transition: []
+```
+
+**Single Transition**: Use the same transition for every image change
+```javascript
+transition: ["fade"]
+```
+
+**Multiple Transitions**: A random transition will be selected for each image change
+```javascript
+transition: ["fade", "slide-left", "slide-right", "zoom"]
+```
+
+**All Transitions**: Maximum variety
+```javascript
+transition: ["fade", "slide-left", "slide-right", "slide-up", "slide-down", "zoom"]
+```
+
+Available transition effects:
+- `fade` - Smooth fade-in effect
+- `slide-left` - Slides in from the right side
+- `slide-right` - Slides in from the left side
+- `slide-up` - Slides in from the bottom
+- `slide-down` - Slides in from the top
+- `zoom` - Zooms in from a smaller size
 
 ## Notes
 

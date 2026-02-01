@@ -14,9 +14,19 @@ export type ModulConfig = {
   showAdditionalInformation: boolean;
   infoTemplate: string;
   dateFormat: DateFormat;
+  transition: TransitionEffect[];
+  transitionDuration: number;
 };
 
 export type DateFormat = "MM/DD/YYYY" | "DD.MM.YYYY" | "YYYY-MM-DD";
+
+export type TransitionEffect =
+  | "fade"
+  | "slide-left"
+  | "slide-right"
+  | "slide-up"
+  | "slide-down"
+  | "zoom";
 
 // TODO: validate these keys when loading the config
 export type PlaceholderKey = "date" | "currentCount" | "totalCount";

@@ -4,6 +4,16 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- Transition effects between images with configurable animations
+  - New `transition` configuration option accepting an array of effects
+  - Six transition effects: `fade`, `slide-left`, `slide-right`, `slide-up`, `slide-down`, `zoom`, `none`
+  - Random transition selection when multiple effects are configured
+  - Configurable transition duration with `transitionDuration` option (default: 1000ms)
+
 ## [1.4.0] - 2026-02-01
 
 ### Added

@@ -1,0 +1,116 @@
+/* MMM-Random-local-image Transition Effects */
+
+.mmm-random-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.mmm-random-image-container {
+  display: inline-block;
+}
+
+/* Fade Transition */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.transition-fade {
+  animation-name: fadeIn;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+/* Slide Left Transition */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.transition-slide-left {
+  animation-name: slideInLeft;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* Slide Right Transition */
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.transition-slide-right {
+  animation-name: slideInRight;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* Slide Up Transition */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.transition-slide-up {
+  animation-name: slideInUp;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* Slide Down Transition */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.transition-slide-down {
+  animation-name: slideInDown;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* Zoom Transition */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.transition-zoom {
+  animation-name: zoomIn;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}

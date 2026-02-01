@@ -16,7 +16,7 @@ Module.register("MMM-Random-local-image", {
     photoDir: "./modules/MMM-Random-local-image/exampleImages/",
     backupDir: undefined,
     photoUpdateInterval: 30 * 1000, // 30 seconds
-    photoLoadInitialDelay: 1000, // 1 second
+    photoLoadInitialDelay: 0,
     photoLoadUpdateInterval: 12 * 60 * 60 * 1000, // 12 hours
     randomOrder: true,
     selectFromSubdirectories: false,
@@ -28,6 +28,10 @@ Module.register("MMM-Random-local-image", {
     maxHeight: "100%",
     infoTemplate: "{{date}}",
     dateFormat: "DD.MM.YYYY",
+    transition: [
+      "fade",
+    ],
+    transitionDuration: 1500, // 1 second in milliseconds
   },
 
   initialImageLoadingFinished: false,
@@ -35,6 +39,8 @@ Module.register("MMM-Random-local-image", {
   totalImages: 0,
   imageIndex: 0,
   error: null,
+
+  getStyles: () => ["MMM-Random-local-image.css"],
 
   start: function () {
     Log.info(`Module ${this.name} started...`);
@@ -138,6 +144,7 @@ Module.register("MMM-Random-local-image", {
 
   getDom: function () {
     const wrapper = document.createElement("div");
+    wrapper.className = "mmm-random-image-wrapper";
 
     if (this.error) {
       wrapper.innerHTML = this.translate(this.error);
@@ -160,7 +167,18 @@ Module.register("MMM-Random-local-image", {
       return wrapper;
     }
 
-    wrapper.appendChild(this.createImageElement(image));
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "mmm-random-image-container";
+
+    const transition = this.getNextTransition();
+    if (transition) {
+      imageContainer.classList.add(`transition-${transition}`);
+      imageContainer.style.animationDuration = `${this.config.transitionDuration}ms`;
+    }
+
+    imageContainer.appendChild(this.createImageElement(image));
+    wrapper.appendChild(imageContainer);
+
     if (this.config.showAdditionalInformation) {
       wrapper.appendChild(this.createInfoElement(image));
     }
@@ -199,5 +217,19 @@ Module.register("MMM-Random-local-image", {
     const node = document.createTextNode(infoText);
     element.appendChild(node);
     return element;
+  },
+
+  /**
+   * Gets a random transition effect from the config array
+   * @returns A single transition effect string
+   */
+  getNextTransition: function () {
+    const transitions = this.config.transition;
+    if (transitions.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * transitions.length);
+    return transitions[randomIndex];
   },
 });
