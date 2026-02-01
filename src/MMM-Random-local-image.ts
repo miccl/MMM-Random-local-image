@@ -49,13 +49,6 @@ Module.register("MMM-Random-local-image", {
       Log.info("Retrieving first images...");
       this.sendSocketNotification(SocketNotification.GetImages, this.config);
     }, this.config.photoLoadInitialDelay);
-
-    setInterval(() => this.loadNextImage(), this.config.photoUpdateInterval);
-
-    // only need to refresh when there are subdirectories
-    if (this.config.selectFromSubdirectories) {
-      setInterval(() => this.loadImages(), this.config.photoLoadUpdateInterval);
-    }
   },
 
   /**
@@ -73,7 +66,10 @@ Module.register("MMM-Random-local-image", {
    * @param notification type of the notification
    * @param payload images
    */
-  socketNotificationReceived: function (notification, payload: ImageChunk) {
+  socketNotificationReceived: function (
+    notification: string,
+    payload: ImageChunk,
+  ) {
     if (notification !== SocketNotification.MediaChunk) {
       return;
     }
@@ -88,8 +84,6 @@ Module.register("MMM-Random-local-image", {
       if (this.config.randomOrder) {
         this.images = shuffle(this.images);
       }
-
-      this.initialImageLoadingFinished = true;
     }
 
     // Add to totalImages for subsequent chunks
@@ -99,13 +93,24 @@ Module.register("MMM-Random-local-image", {
     if (payload.isLastChunk && this.config.randomOrder) {
       this.images = shuffle(this.images);
     }
+
+    // Update DOM to show progress
+    if (!this.initialImageLoadingFinished) {
+      this.initialImageLoadingFinished = true;
+      this.loadNextImage();
+      setInterval(() => this.loadNextImage(), this.config.photoUpdateInterval);
+
+      // only need to refresh when there are subdirectories
+      if (this.config.selectFromSubdirectories) {
+        setInterval(
+          () => this.loadImages(),
+          this.config.photoLoadUpdateInterval,
+        );
+      }
+    }
   },
 
   loadNextImage: function () {
-    if (!this.initialImageLoadingFinished) {
-      return;
-    }
-
     const allImagesShown = this.setNextImage();
     if (allImagesShown) {
       this.loadImages(); // Automatically reload images when all have been shown
@@ -140,14 +145,18 @@ Module.register("MMM-Random-local-image", {
     }
 
     if (!this.initialImageLoadingFinished) {
-      wrapper.innerHTML = this.translate("LOADING");
+      // Show loading progress if available
+      if (this.totalFilesToLoad > 0) {
+        wrapper.innerHTML = `Loading ${this.filesProcessed}/${this.totalFilesToLoad} files...`;
+      } else {
+        wrapper.innerHTML = `Loading...`;
+      }
       return wrapper;
     }
 
     const image = this.images[this.imageIndex];
     if (!image) {
       Log.error(`Could not load image (index: ${this.imageIndex})`);
-      wrapper.innerHTML = this.translate("ERROR LOADING");
       return wrapper;
     }
 

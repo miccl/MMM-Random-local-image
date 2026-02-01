@@ -4,12 +4,12 @@ All notable changes to MMM-Random-local-image module will be documented in this 
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.4.0] - Unreleased
+## [1.4.0] - 2026-02-01
 
 ### Added
 
 - Add option for a backup dir to display media when `photoDir` has no files or is unreadable.
-- Will show error images directly on the mirror when the app runs into an error.
+- Will show error information directly on the mirror when the app runs into an error.
 - Added tests
 - Replaced ESLint + Prettier with Biome
 
@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Prevent crash when enumerating subdirectories in getPhotoDir
 - Improve hasFilesInDirectory robustness by handling ENOENT gracefully and logging other filesystem errors
+- Improve first image load
 
 ## [1.3.0] - 2025-10-23
 
