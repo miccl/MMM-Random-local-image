@@ -1,3 +1,0 @@
-There are no files in photoDir and backupDir.
-Please check the configuration!
-Greetings from MMM-Random-local-image module :)
