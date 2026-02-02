@@ -23,8 +23,9 @@ cd ~/MagicMirror/modules
 git clone https://github.com/miccl/MMM-Random-local-image.git
 cd MMM-Random-local-image
 npm ci
-npm run build
 ```
+
+If post-scripts are disabled, run `npm run build` afterward.
 
 Finally, configure the module in the config.js file (instructions below).
 
@@ -38,6 +39,8 @@ git pull
 npm ci
 npm run build
 ```
+
+If post-scripts are disabled, run `npm run build` afterward.
 
 Check the [Changelog](CHANGELOG.md) for all updates.
 
