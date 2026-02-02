@@ -114,3 +114,11 @@
   animation-timing-function: ease-out;
   animation-fill-mode: both;
 }
+
+/* Backup Directory Indicator */
+.backup-indicator {
+  color: #ff9800;
+  font-size: 0.9em;
+  margin-left: 8px;
+  opacity: 0.8;
+}

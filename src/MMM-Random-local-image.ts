@@ -37,6 +37,7 @@ Module.register("MMM-Random-local-image", {
   totalImages: 0,
   imageIndex: 0,
   error: null,
+  isUsingBackup: false,
 
   getStyles: () => ["MMM-Random-local-image.css"],
 
@@ -85,6 +86,7 @@ Module.register("MMM-Random-local-image", {
     if (payload.isFirstChunk) {
       this.totalImages = payload.images.length;
       this.imageIndex = -1;
+      this.isUsingBackup = payload.isUsingBackup ?? false;
       if (this.config.randomOrder) {
         this.images = shuffle(this.images);
       }
@@ -214,6 +216,15 @@ Module.register("MMM-Random-local-image", {
 
     const node = document.createTextNode(infoText);
     element.appendChild(node);
+
+    // Add backup indicator if using backup directory
+    if (this.isUsingBackup) {
+      const backupIndicator = document.createElement("span");
+      backupIndicator.className = "backup-indicator";
+      backupIndicator.textContent = " 🔄 Backup";
+      element.appendChild(backupIndicator);
+    }
+
     return element;
   },
 
