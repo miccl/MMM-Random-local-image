@@ -21,6 +21,8 @@ const CHUNK_SIZE = 50;
 type NodeHelperContext = {
   sendImages: (chunk: ImageChunk) => void;
   getImages: (self: NodeHelperContext, payload: ModulConfig) => void;
+  isLoadingImages?: boolean;
+  retryTimeoutId?: NodeJS.Timeout;
 };
 
 module.exports = NodeHelper.create({
@@ -41,6 +43,22 @@ module.exports = NodeHelper.create({
     self: NodeHelperContext,
     payload: ModulConfig,
   ): Promise<void> => {
+    if (self.isLoadingImages) {
+      console.log(
+        `[getImages] Already loading images, skipping duplicate call`,
+      );
+      return;
+    }
+
+    self.isLoadingImages = true;
+    console.log(`[getImages] Starting image loading process`);
+
+    if (self.retryTimeoutId) {
+      console.log(`[getImages] Clearing previous retry timeout`);
+      clearTimeout(self.retryTimeoutId);
+      self.retryTimeoutId = undefined;
+    }
+
     try {
       // Outer try: catches synchronous errors from getMediaDir()
       const photoDir = getMediaDir(payload, self);
@@ -93,17 +111,21 @@ module.exports = NodeHelper.create({
             }
 
             console.log(
-              `Processing complete for ${data.length} files in dir '${photoDir}'`,
+              `[getImages] Processing complete for ${data.length} files in dir '${photoDir}'`,
             );
+
+            self.isLoadingImages = false;
           } catch (callbackErr) {
             // Handle errors from inside recursive callback
             await handleMediaLoadError(self, callbackErr);
+            self.isLoadingImages = false;
           }
         },
       );
     } catch (err) {
       // Handle errors from getMediaDir (synchronous, before recursive)
       await handleMediaLoadError(self, err);
+      self.isLoadingImages = false;
     }
   },
 
@@ -121,26 +143,50 @@ function getMediaDir(payload: ModulConfig, self: NodeHelperContext): string {
   const photoDir = getDirByPath(payload);
 
   if (!photoDir) {
-    console.log(
-      `Nothing found in photoDir: ${payload.photoDir}, trying backupDir...`,
-    );
+    if (payload.selectFromSubdirectories) {
+      console.log(
+        `[getMediaDir] No suitable subdirectory found in ${payload.photoDir}. Trying backupDir...`,
+      );
+    } else {
+      console.log(
+        `[getMediaDir] No media files in ${payload.photoDir}. Trying backupDir...`,
+      );
+    }
 
     if (
       payload.backupDir &&
       hasMediaFilesInDirectory(payload.backupDir, payload)
     ) {
+      console.log(`[getMediaDir] Using backupDir: ${payload.backupDir}`);
       // Setup retry timer ONLY when using backupDir (fallback scenario)
-      setTimeout(() => self.getImages(self, payload), 60 * 1000);
+      console.log(
+        `[getMediaDir] Will retry photoDir in 60 seconds in case it becomes available`,
+      );
+      self.retryTimeoutId = setTimeout(() => {
+        console.log(
+          `[getMediaDir] Retry timeout triggered, attempting to reload from photoDir`,
+        );
+        self.getImages(self, payload);
+      }, 60 * 1000);
       return payload.backupDir;
     }
 
     // No media found in photoDir or backupDir
+    console.error(
+      `[getMediaDir] No media files found in photoDir or backupDir. Will retry in 60 seconds.`,
+    );
     // Setup retry before throwing error
-    setTimeout(() => self.getImages(self, payload), 60 * 1000);
+    self.retryTimeoutId = setTimeout(() => {
+      console.log(
+        `[getMediaDir] Retry timeout triggered after error, attempting to reload`,
+      );
+      self.getImages(self, payload);
+    }, 60 * 1000);
     throw new BackupDirNotFoundError(payload.photoDir, payload.backupDir);
   }
 
   // Happy path - photoDir found successfully, NO retry timeout
+  console.log(`[getMediaDir] Successfully using photoDir: ${photoDir}`);
   return photoDir;
 }
 

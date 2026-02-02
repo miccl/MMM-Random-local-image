@@ -44,7 +44,7 @@ describe("directory utilities (memfs)", () => {
     });
 
     describe("given selectFromSubdirectories=true", () => {
-      it("returns null when subdirectories array is empty and logs an error", () => {
+      it("returns null when subdirectories array is empty and logs a warning", () => {
         createFiles("/base/file.txt");
         const config = {
           ...baseConfig,
@@ -52,10 +52,14 @@ describe("directory utilities (memfs)", () => {
           ignoreDirRegex: "^$",
         };
 
-        const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
         const result = getDirByPath(config);
         expect(result).toBeNull();
-        expect(spy).toHaveBeenCalled();
+        expect(warnSpy).toHaveBeenCalled();
+
+        logSpy.mockRestore();
+        warnSpy.mockRestore();
       });
 
       it("returns null when getting subdirectories throws and logs a message", () => {
