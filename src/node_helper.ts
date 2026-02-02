@@ -61,7 +61,7 @@ module.exports = NodeHelper.create({
 
     try {
       // Outer try: catches synchronous errors from getMediaDir()
-      const photoDir = getMediaDir(payload, self);
+      const { dir: photoDir, isUsingBackup } = getMediaDir(payload, self);
 
       recursive(
         photoDir,
@@ -96,6 +96,7 @@ module.exports = NodeHelper.create({
                   images: currentChunk,
                   isFirstChunk,
                   isLastChunk: false,
+                  isUsingBackup,
                 });
                 isFirstChunk = false;
                 currentChunk = [];
@@ -107,6 +108,7 @@ module.exports = NodeHelper.create({
                 images: currentChunk,
                 isFirstChunk,
                 isLastChunk: true,
+                isUsingBackup,
               });
             }
 
@@ -139,7 +141,10 @@ function ignoreFiles(config: ModulConfig) {
     stats.isFile() && !isImageOrVideo(path.basename(filePath), config);
 }
 
-function getMediaDir(payload: ModulConfig, self: NodeHelperContext): string {
+function getMediaDir(
+  payload: ModulConfig,
+  self: NodeHelperContext,
+): { dir: string; isUsingBackup: boolean } {
   const photoDir = getDirByPath(payload);
 
   if (!photoDir) {
@@ -168,7 +173,7 @@ function getMediaDir(payload: ModulConfig, self: NodeHelperContext): string {
         );
         self.getImages(self, payload);
       }, 60 * 1000);
-      return payload.backupDir;
+      return { dir: payload.backupDir, isUsingBackup: true };
     }
 
     // No media found in photoDir or backupDir
@@ -187,7 +192,7 @@ function getMediaDir(payload: ModulConfig, self: NodeHelperContext): string {
 
   // Happy path - photoDir found successfully, NO retry timeout
   console.log(`[getMediaDir] Successfully using photoDir: ${photoDir}`);
-  return photoDir;
+  return { dir: photoDir, isUsingBackup: false };
 }
 
 /**
@@ -221,6 +226,7 @@ async function handleMediaLoadError(
       images: [errorImage],
       isFirstChunk: true,
       isLastChunk: true,
+      isUsingBackup: false,
     });
 
     console.log(`Error image sent to frontend: ${err.title}`);
