@@ -78,6 +78,13 @@ export function getSubDirectories(
     .filter((dirName: string) => !dirName.match(ignoreDirRegex));
 }
 
+/**
+ * Recursively checks if a directory or any of its subdirectories contain media files.
+ * Exits immediately upon finding the first media file.
+ * @param dirPath Path to the directory to check
+ * @param options Configuration options
+ * @returns true if media files are found anywhere in the directory tree
+ */
 export function hasMediaFilesInDirectory(
   dirPath: string,
   options: Pick<ModulConfig, "ignoreVideos">,
@@ -85,11 +92,22 @@ export function hasMediaFilesInDirectory(
   try {
     const dir = fs.opendirSync(dirPath);
     let dirent: Dirent | null = dir.readSync();
+
     while (dirent !== null) {
       if (dirent.isFile() && isImageOrVideo(dirent.name, options)) {
         dir.closeSync();
-        return true; // Found one, exit immediately
+        return true; // Found a media file, exit immediately
       }
+
+      if (dirent.isDirectory()) {
+        const subDirPath = path.join(dirPath, dirent.name);
+        // Recursively check subdirectory
+        if (hasMediaFilesInDirectory(subDirPath, options)) {
+          dir.closeSync();
+          return true; // Found media in subdirectory
+        }
+      }
+
       dirent = dir.readSync();
     }
 
@@ -98,7 +116,6 @@ export function hasMediaFilesInDirectory(
   } catch (err: unknown) {
     const error = err as NodeJS.ErrnoException;
     if (error?.code !== "ENOENT") {
-      // if the error exists, but it still throws an error
       console.error("Error reading directory:", error);
     }
     return false;
@@ -106,7 +123,7 @@ export function hasMediaFilesInDirectory(
 }
 
 /**
- * Gets all subdirectories that contain media files.
+ * Gets all subdirectories that contain media files (checks recursively).
  * @param subDirectories Array of subdirectory names
  * @param baseDir Base directory path
  * @param payload Configuration options

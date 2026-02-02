@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - File creation date fallback to modification time on filesystems without birthtime support (fixes "1.1.1970" date issue on Raspberry Pi)
-- Subdirectory selection now scans all directories first, guaranteeing non-empty directory selection when available (previously only tried 3 random attempts)
+- Directory media detection now works recursively, finding files in nested subdirectories (affects all directory checks including selectFromSubdirectories and backupDir)
 - Added lock mechanism to prevent parallel image loading operations
 - Retry timeouts are now properly cleaned up, preventing accumulation of multiple timers
 - Enhanced logging with function name prefixes for easier troubleshooting

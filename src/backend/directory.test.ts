@@ -186,10 +186,24 @@ describe("directory utilities (memfs)", () => {
   });
 
   describe("hasMediaFilesInDirectory", () => {
-    it("returns true when a media file is found", () => {
+    it("returns true when a media file is found in root directory", () => {
       createFiles("/some/dir/notes.txt", "/some/dir/photo.jpg");
 
       const result = hasMediaFilesInDirectory("/some/dir", baseConfig);
+      expect(result).toBe(true);
+    });
+
+    it("returns true when media files are in subdirectories", () => {
+      createFiles("/test/subdir/photo.jpg", "/test/notes.txt");
+
+      const result = hasMediaFilesInDirectory("/test", baseConfig);
+      expect(result).toBe(true);
+    });
+
+    it("returns true when media files are in deeply nested subdirectories", () => {
+      createFiles("/test/level1/level2/level3/photo.jpg");
+
+      const result = hasMediaFilesInDirectory("/test", baseConfig);
       expect(result).toBe(true);
     });
 
@@ -200,11 +214,23 @@ describe("directory utilities (memfs)", () => {
       expect(result).toBe(false);
     });
 
+    it("returns false when no media files exist anywhere in the tree", () => {
+      createFiles("/test/file.txt", "/test/subdir/doc.pdf");
+
+      const result = hasMediaFilesInDirectory("/test", baseConfig);
+      expect(result).toBe(false);
+    });
+
     it("returns false and does not log error for ENOENT", () => {
       const spy = vi.spyOn(console, "error").mockImplementation(() => {});
       const result = hasMediaFilesInDirectory("/missing/dir", baseConfig);
       expect(result).toBe(false);
       expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("returns false for non-existent directory", () => {
+      const result = hasMediaFilesInDirectory("/nonexistent", baseConfig);
+      expect(result).toBe(false);
     });
 
     it("returns false and logs error for unexpected errors", () => {
@@ -220,6 +246,31 @@ describe("directory utilities (memfs)", () => {
       const result = hasMediaFilesInDirectory("/restricted/dir", baseConfig);
       expect(result).toBe(false);
       expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe("getAllNonEmptySubdirectories with recursive check", () => {
+    it("should find subdirectories with media files in nested folders", () => {
+      createFiles(
+        "/base/dir1/notes.txt",
+        "/base/dir2/nested/photo.jpg",
+        "/base/dir3/deep/deeper/image.png",
+      );
+      const config = {
+        ...baseConfig,
+        selectFromSubdirectories: true,
+        ignoreDirRegex: "^$",
+      };
+
+      // Mock console.log to avoid noise in tests
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      const result = getDirByPath(config);
+
+      // Should find dir2 or dir3 (both have media in subdirectories)
+      expect(result === "/base/dir2" || result === "/base/dir3").toBe(true);
+
+      logSpy.mockRestore();
     });
   });
 });
