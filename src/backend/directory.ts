@@ -72,7 +72,32 @@ export function hasMediaFilesInDirectory(
 }
 
 /**
+ * Gets all subdirectories that contain media files.
+ * @param subDirectories Array of subdirectory names
+ * @param baseDir Base directory path
+ * @param payload Configuration options
+ * @returns Array of full paths to non-empty subdirectories
+ */
+function getAllNonEmptySubdirectories(
+  subDirectories: string[],
+  baseDir: string,
+  payload: Pick<ModulConfig, "ignoreVideos">,
+): string[] {
+  const nonEmptyDirs: string[] = [];
+
+  for (const subDir of subDirectories) {
+    const subDirPath = path.join(baseDir, subDir);
+    if (hasMediaFilesInDirectory(subDirPath, payload)) {
+      nonEmptyDirs.push(subDirPath);
+    }
+  }
+
+  return nonEmptyDirs;
+}
+
+/**
  * Picks a random non-empty subdirectory.
+ * First finds all non-empty directories, then selects one randomly.
  * Returns the path of the subdirectory, otherwise null.
  */
 function selectRandomSubdirectoryPath(
@@ -80,16 +105,29 @@ function selectRandomSubdirectoryPath(
   baseDir: string,
   payload: Pick<ModulConfig, "ignoreVideos">,
 ): string | null {
-  let tries = 3;
-  while (tries > 0) {
-    const randomSubDirectory =
-      subDirectories[Math.floor(Math.random() * subDirectories.length)];
-    const subDirectoryPath = path.join(baseDir, randomSubDirectory);
-    if (hasMediaFilesInDirectory(subDirectoryPath, payload)) {
-      return subDirectoryPath;
-    }
-    tries--;
+  // Get all non-empty subdirectories
+  const nonEmptyDirs = getAllNonEmptySubdirectories(
+    subDirectories,
+    baseDir,
+    payload,
+  );
+
+  if (nonEmptyDirs.length === 0) {
+    console.log(
+      `[selectRandomSubdirectoryPath] No non-empty subdirectories found in ${baseDir} (checked ${subDirectories.length} directories)`,
+    );
+    return null;
   }
 
-  return null; // TOOD: throw error
+  console.log(
+    `[selectRandomSubdirectoryPath] Found ${nonEmptyDirs.length} non-empty subdirectories out of ${subDirectories.length} total`,
+  );
+
+  // Pick a random directory from the non-empty ones
+  const randomIndex = Math.floor(Math.random() * nonEmptyDirs.length);
+  const selectedDir = nonEmptyDirs[randomIndex];
+
+  console.log(`[selectRandomSubdirectoryPath] Selected: ${selectedDir}`);
+
+  return selectedDir;
 }

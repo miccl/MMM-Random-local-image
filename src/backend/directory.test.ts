@@ -83,14 +83,19 @@ describe("directory utilities (memfs)", () => {
           ignoreDirRegex: "^$",
         };
 
+        // Mock console.log to avoid noise in tests
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
         const mathSpy = vi.spyOn(Math, "random");
-        mathSpy.mockReturnValueOnce(0.1).mockReturnValueOnce(0.9);
+        mathSpy.mockReturnValueOnce(0.9); // Only need one random call now
 
         const result = getDirByPath(config);
-        expect(result === "/base/dir2").toBe(true);
+        expect(result).toBe("/base/dir2");
+
+        logSpy.mockRestore();
       });
 
-      it("returns null when no non-empty subdirectory is found after retries", () => {
+      it("returns null when no non-empty subdirectory is found", () => {
         createFiles("/base/dir1/notes.txt", "/base/dir2/notes.txt");
         const config = {
           ...baseConfig,
@@ -98,8 +103,67 @@ describe("directory utilities (memfs)", () => {
           ignoreDirRegex: "^$",
         };
 
+        // Mock console.log to avoid noise in tests
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
         const result = getDirByPath(config);
         expect(result).toBeNull();
+
+        logSpy.mockRestore();
+      });
+
+      it("always finds non-empty subdirectory when at least one exists", () => {
+        // Create multiple subdirectories, only one with media
+        createFiles(
+          "/base/empty1/notes.txt",
+          "/base/empty2/doc.pdf",
+          "/base/photos/image.jpg",
+          "/base/empty3/readme.md",
+        );
+        const config = {
+          ...baseConfig,
+          selectFromSubdirectories: true,
+          ignoreDirRegex: "^$",
+        };
+
+        // Mock console.log to avoid noise in tests
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        const result = getDirByPath(config);
+        // Should always find the "photos" directory, regardless of random selection
+        expect(result).toBe("/base/photos");
+
+        logSpy.mockRestore();
+      });
+
+      it("selects randomly from multiple non-empty subdirectories", () => {
+        createFiles(
+          "/base/photos1/image1.jpg",
+          "/base/photos2/image2.jpg",
+          "/base/empty/notes.txt",
+        );
+        const config = {
+          ...baseConfig,
+          selectFromSubdirectories: true,
+          ignoreDirRegex: "^$",
+        };
+
+        // Mock console.log to avoid noise in tests
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        const mathSpy = vi.spyOn(Math, "random");
+
+        // First call: select first non-empty directory (photos1)
+        mathSpy.mockReturnValueOnce(0.1);
+        const result1 = getDirByPath(config);
+        expect(result1).toBe("/base/photos1");
+
+        // Second call: select second non-empty directory (photos2)
+        mathSpy.mockReturnValueOnce(0.9);
+        const result2 = getDirByPath(config);
+        expect(result2).toBe("/base/photos2");
+
+        logSpy.mockRestore();
       });
     });
   });
