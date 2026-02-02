@@ -10,7 +10,7 @@ import {
   DirectoryReadError,
   NoMediaFilesError,
 } from "./backend/errors";
-import { isImageOrVideo } from "./backend/file";
+import { getFileDate, isImageOrVideo } from "./backend/file";
 import type { ModulConfig } from "./types/config";
 import type { Image, ImageChunk } from "./types/image";
 import { SocketNotification } from "./types/socket-notification";
@@ -189,10 +189,13 @@ function processFilePath(photoDir: string, fullPath: string): Image | null {
     return null;
   }
 
+  const stats = fs.statSync(fullPath);
+  const fileDate = getFileDate(stats);
+
   return {
     fullPath,
     mimeType,
     relativePath: `${path.basename(photoDir)}/${fullPath.slice(photoDir.length - 2)}`,
-    creationDate: fs.statSync(fullPath).birthtime.toDateString(), // TODO: can i parse this one?
+    creationDate: fileDate.toDateString(),
   };
 }

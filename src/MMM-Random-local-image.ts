@@ -28,9 +28,7 @@ Module.register("MMM-Random-local-image", {
     maxHeight: "100%",
     infoTemplate: "{{date}}",
     dateFormat: "DD.MM.YYYY",
-    transition: [
-      "fade",
-    ],
+    transition: ["fade"],
     transitionDuration: 1500, // 1 second in milliseconds
   },
 

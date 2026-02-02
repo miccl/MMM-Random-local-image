@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Random transition selection when multiple effects are configured
   - Configurable transition duration with `transitionDuration` option (default: 1000ms)
 
+### Fixed
+
+- File creation date now falls back to modification time on filesystems that don't support birthtime (e.g., ext4 on Raspberry Pi)
+
 ## [1.4.0] - 2026-02-01
 
 ### Added
