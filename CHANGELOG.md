@@ -16,12 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- File creation date now falls back to modification time on filesystems that don't support birthtime (e.g., ext4 on Raspberry Pi)
-- Improved subdirectory selection algorithm when `selectFromSubdirectories` is enabled
-  - Now finds ALL non-empty subdirectories first, then selects randomly from them
-  - Guarantees finding a non-empty subdirectory if one exists (previously only tried 3 random attempts)
-  - Eliminates race conditions and confusing "Nothing found in photoDir" messages when non-empty directories exist
-  - Added detailed logging for subdirectory selection process
+- File creation date fallback to modification time on filesystems without birthtime support (fixes "1.1.1970" date issue on Raspberry Pi)
+- Subdirectory selection now scans all directories first, guaranteeing non-empty directory selection when available (previously only tried 3 random attempts)
+- Added lock mechanism to prevent parallel image loading operations
+- Retry timeouts are now properly cleaned up, preventing accumulation of multiple timers
+- Enhanced logging with function name prefixes for easier troubleshooting
 
 ## [1.4.0] - 2026-02-01
 

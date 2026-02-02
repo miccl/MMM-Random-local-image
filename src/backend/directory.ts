@@ -12,25 +12,59 @@ export function getDirByPath(
   const baseDir = config.photoDir;
 
   if (!config.selectFromSubdirectories) {
-    return hasMediaFilesInDirectory(baseDir, config) ? baseDir : null;
+    const hasFiles = hasMediaFilesInDirectory(baseDir, config);
+    if (!hasFiles) {
+      console.log(
+        `[getDirByPath] No media files found in base directory: ${baseDir}`,
+      );
+    } else {
+      console.log(`[getDirByPath] Using base directory: ${baseDir}`);
+    }
+    return hasFiles ? baseDir : null;
   }
+
+  // selectFromSubdirectories is enabled
+  console.log(
+    `[getDirByPath] Looking for subdirectories in ${baseDir} (ignoreDirRegex: ${config.ignoreDirRegex})`,
+  );
 
   let subDirectories = [];
   try {
     subDirectories = getSubDirectories(baseDir, config.ignoreDirRegex);
   } catch (err) {
-    console.log(`Error processing subdirectories for ${baseDir}`, err);
-    return null;
-  }
-
-  if (subDirectories.length === 0) {
     console.error(
-      `no subdirectories found (ignoreDirRegex: ${config.ignoreDirRegex}). falling back to base directory.`,
+      `[getDirByPath] Error reading subdirectories in ${baseDir}:`,
+      err,
     );
     return null;
   }
 
-  return selectRandomSubdirectoryPath(subDirectories, baseDir, config);
+  if (subDirectories.length === 0) {
+    console.warn(
+      `[getDirByPath] No subdirectories found in ${baseDir} (ignoreDirRegex: ${config.ignoreDirRegex})`,
+    );
+    return null;
+  }
+
+  console.log(
+    `[getDirByPath] Found ${subDirectories.length} subdirectories in ${baseDir}`,
+  );
+
+  const selectedDir = selectRandomSubdirectoryPath(
+    subDirectories,
+    baseDir,
+    config,
+  );
+
+  if (!selectedDir) {
+    console.warn(
+      `[getDirByPath] No non-empty subdirectories found (checked ${subDirectories.length} directories)`,
+    );
+  } else {
+    console.log(`[getDirByPath] Selected subdirectory: ${selectedDir}`);
+  }
+
+  return selectedDir;
 }
 
 export function getSubDirectories(
