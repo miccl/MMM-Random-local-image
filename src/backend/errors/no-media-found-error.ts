@@ -2,18 +2,18 @@ import { BackendError } from "../backend-error";
 import { truncatePath } from "../path";
 
 /**
- * Error thrown when the backup directory cannot be found or has no media files.
+ * Error thrown when no media files are found in any configured directories.
  */
-export class BackupDirNotFoundError extends BackendError {
+export class NoMediaFoundError extends BackendError {
   public readonly photoDir: string;
   public readonly backupDir?: string;
 
   constructor(photoDir: string, backupDir?: string) {
     super(
-      "Backup Directory Not Found",
+      backupDir ? "Backup Directory Not Found" : "No Media Found",
       backupDir
         ? `No media files found in photoDir (${photoDir}) and backupDir (${backupDir})`
-        : `No media files found in photoDir (${photoDir}) and no backupDir configured`,
+        : `No media files found in photoDir (${photoDir})`,
       { photoDir, backupDir },
     );
     this.photoDir = photoDir;
@@ -31,5 +31,11 @@ export class BackupDirNotFoundError extends BackendError {
         ? `Backup Dir: ${truncatePath(this.backupDir)}`
         : "Backup Dir: Not configured",
     ];
+  }
+
+  getHelpText(): string {
+    return this.backupDir
+      ? "Add media files to the photo directory or backup directory"
+      : "Add media files to the photo directory or configure a backup directory";
   }
 }

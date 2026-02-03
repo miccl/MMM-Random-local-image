@@ -6,9 +6,9 @@ import recursive from "recursive-readdir";
 import { isBackendError } from "./backend/backend-error";
 import { getDirByPath, hasMediaFilesInDirectory } from "./backend/directory";
 import {
-  BackupDirNotFoundError,
   DirectoryReadError,
   NoMediaFilesError,
+  NoMediaFoundError,
 } from "./backend/errors";
 import { getFileDate, isImageOrVideo } from "./backend/file";
 import type { ModulConfig } from "./types/config";
@@ -187,7 +187,7 @@ function getMediaDir(
       );
       self.getImages(self, payload);
     }, 60 * 1000);
-    throw new BackupDirNotFoundError(payload.photoDir, payload.backupDir);
+    throw new NoMediaFoundError(payload.photoDir, payload.backupDir);
   }
 
   // Happy path - photoDir found successfully, NO retry timeout
