@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { isBackendError } from "./backend-error";
 import {
-  BackupDirNotFoundError,
   DirectoryReadError,
   NoMediaFilesError,
+  NoMediaFoundError,
 } from "./errors";
 
 describe("BackendError Base Class", () => {
   it("should generate error image with consistent format", async () => {
-    const error = new BackupDirNotFoundError("/path/to/photos");
+    const error = new NoMediaFoundError("/path/to/photos");
     const image = await error.generateErrorImage();
 
     expect(image).toMatch(/^data:image\/png;base64,/);
@@ -16,7 +16,7 @@ describe("BackendError Base Class", () => {
   });
 
   it("should be identifiable via isBackendError", () => {
-    const error = new BackupDirNotFoundError("/path");
+    const error = new NoMediaFoundError("/path");
     const regularError = new Error("regular error");
 
     expect(isBackendError(error)).toBe(true);
@@ -28,7 +28,7 @@ describe("BackendError Base Class", () => {
 
 describe("Error Image Generation", () => {
   it("should escape XML in paths", async () => {
-    const error = new BackupDirNotFoundError(
+    const error = new NoMediaFoundError(
       "/path/with<special>&chars",
       "/backup/with\"quotes'",
     );
@@ -49,7 +49,7 @@ describe("Error Image Generation", () => {
   });
 
   it("should generate different images for different error types", async () => {
-    const error1 = new BackupDirNotFoundError("/path1");
+    const error1 = new NoMediaFoundError("/path1");
     const error2 = new DirectoryReadError("/path2", new Error("Test"));
     const error3 = new NoMediaFilesError("/path3", true);
 
