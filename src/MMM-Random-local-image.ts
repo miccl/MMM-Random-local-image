@@ -171,12 +171,10 @@ Module.register("MMM-Random-local-image", {
     imageContainer.className = "mmm-random-image-container";
 
     const transition = this.getNextTransition();
-    if (transition) {
-      imageContainer.classList.add(`transition-${transition}`);
-      imageContainer.style.animationDuration = `${this.config.transitionDuration}ms`;
-    }
 
-    imageContainer.appendChild(this.createImageElement(image));
+    imageContainer.appendChild(
+      this.createImageElement(image, imageContainer, transition),
+    );
     wrapper.appendChild(imageContainer);
 
     if (this.config.showAdditionalInformation) {
@@ -186,18 +184,54 @@ Module.register("MMM-Random-local-image", {
     return wrapper;
   },
 
-  createImageElement: function (image: Image) {
+  createImageElement: function (
+    image: Image,
+    container: HTMLElement | null = null,
+    transition: string | null = null,
+  ) {
     const mediaType = image.mimeType.split("/")[0];
     let element: HTMLImageElement | HTMLVideoElement =
       document.createElement("img");
     if (mediaType === "video") {
       element = document.createElement("video");
+      element.autoplay = true;
+      element.loop = true;
+      element.muted = true;
+    }
+
+    element.style.maxWidth = String(this.config.maxWidth);
+    element.style.maxHeight = String(this.config.maxHeight);
+    element.style.opacity = "0"; // Hide initially
+
+    const showAndStartTransition = () => {
+      element.style.opacity = String(this.config.opacity);
+
+      // Start transition on container after image is visible
+      if (container && transition) {
+        // Use requestAnimationFrame to ensure opacity change is painted first
+        requestAnimationFrame(() => {
+          container.classList.add(`transition-${transition}`);
+          container.style.animationDuration = `${this.config.transitionDuration}ms`;
+        });
+      }
+    };
+
+    if (mediaType === "image") {
+      // For images: Wait for load before showing
+      element.onload = () => {
+        showAndStartTransition();
+      };
+      element.onerror = () => {
+        // If image fails to load, show it anyway after 5 seconds
+        setTimeout(() => {
+          showAndStartTransition();
+        }, 5000);
+      };
+    } else {
+      showAndStartTransition();
     }
 
     element.src = image.fullPath;
-    element.style.maxWidth = String(this.config.maxWidth);
-    element.style.maxHeight = String(this.config.maxHeight);
-    element.style.opacity = String(this.config.opacity);
     return element;
   },
 
