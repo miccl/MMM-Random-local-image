@@ -47,7 +47,9 @@ describe("NoMediaFoundError", () => {
       const error = new NoMediaFoundError("/photos");
       const displayMessage = error.getDisplayMessage();
 
-      expect(displayMessage).toBe("No media files found in configured directories");
+      expect(displayMessage).toBe(
+        "No media files found in configured directories",
+      );
     });
 
     it("should show only photoDir in error details", () => {
@@ -107,7 +109,9 @@ describe("NoMediaFoundError", () => {
       const error = new NoMediaFoundError("/photos", "/backup");
       const displayMessage = error.getDisplayMessage();
 
-      expect(displayMessage).toBe("No media files found in configured directories");
+      expect(displayMessage).toBe(
+        "No media files found in configured directories",
+      );
     });
 
     it("should provide error details with both directories", () => {
