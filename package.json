@@ -32,7 +32,7 @@
     "@types/recursive-readdir": "^2.2.4",
     "@types/sharp": "^0.31.1",
     "memfs": "^4.51.1",
-    "rollup": "^4.54.0",
+    "rollup": "^4.59.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   }
